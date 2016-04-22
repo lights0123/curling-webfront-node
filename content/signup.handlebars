@@ -1,0 +1,102 @@
+<script src="/js/jquery.validate.min.js"></script>
+<div>
+	<p>Please enter your information below:</p>
+	<form id="signup_form" action="/signup"
+		  method="POST" enctype="multipart/form-data">
+		<fieldset>
+				<input type="text" id="username" name="username" size="20" placeholder="Username"/>
+				<input type="email" id="email" name="email" size="30" placeholder="Email Address"/>
+				<input type="password" id="password" name="password" size="20" placeholder="Password"/>
+		</fieldset>
+		<br/>
+		<fieldset class="center">
+			<input type="submit" value="Sign Up"/>
+			<br/>
+			<small>By signing up, you agree to the CSC Curling's <a href="/tos">Terms of Service</a> and <a
+					href="/privacy">Privacy Policy</a>.
+			</small>
+		</fieldset>
+	</form>
+	<script>
+		$("#signup_form").validate({
+			rules: {
+				username: {
+					required: true,
+					minlength: 4,
+					maxlength: 64
+				},
+				password: {
+					required: true,
+					minlength: 6,
+					maxlength: 1000
+				},
+				email: {
+					required: true,
+					email: true,
+					maxlength: 254
+				}
+			},
+			messages: {
+				password: {
+					minlength: "Passwords must be at least 6 characters",
+					required: "Please enter a password"
+				},
+				username: {
+					minlength: "Please enter a username no less than 4 characters",
+					required: "Please select a username",
+					maxlength: "Please enter a username no more than 64 characters"
+				},
+				email: {
+					email: "Please enter a valid email address",
+					required: "Please enter an email address",
+					maxlength: "Your email address must be no more than 254 characters"
+				}
+			},
+			submitHandler: function (form) {
+				$.post($(form).attr('action'), $(form).serialize() + "&from=jquery", function (data) {
+					var jData;
+					if(typeof data === "object") jData = data;
+					else jData = JSON.parse(data);
+					if (jData['success'] === true) {
+						window.location = jData['redirect'];
+					} else if (jData['success'] === false) {
+						var miscError = "";
+						for (var index in jData['error']) {
+							if (jData['error'].hasOwnProperty(index)) {
+								switch (index) {
+									case 'password':
+										var password = $('#password');
+										password.siblings("[for][style]").remove();
+										password.after('<label for="password" class="error" id="password-error"></label>');
+										$('#password-error').text(jData['error'][index]);
+										password.addClass('error');
+										break;
+									case 'username':
+										var username = $("#username");
+										username.siblings("[for][style]").remove();
+										username.after('<label for="username" class="error" id="username-error"></label>');
+										$('#username-error').text(jData['error'][index]);
+										username.addClass('error');
+										break;
+									case 'email':
+										var email = $("#email");
+										email.siblings("[for][style]").remove();
+										email.after('<label for="email" class="error" id="email-error"></label>');
+										$('#email-error').text(jData['error'][index]);
+										email.addClass('error');
+										break;
+									default:
+										miscError += jData['error'][index] + ".\n";
+								}
+							}
+						}
+						if (miscError !== "") {
+							$("#signup_form").parent().prepend('<div class="notice errorbox"><p></p></div>');
+							$("#signup_form").parent().find("div.notice.errorbox p").text(miscError);
+						}
+					}
+				});
+			}
+		});
+	</script>
+</div>

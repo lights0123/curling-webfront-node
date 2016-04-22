@@ -1,0 +1,191 @@
+<div>
+	<script>
+		function downloadScript(url) {
+			downloadScriptFunction:{
+				if (localStorage) {
+					try {
+						var theData = JSON.parse(localStorage.getItem(url));
+						if (theData[1].length == theData[0]) {
+							break downloadScriptFunction;
+						}
+					} catch (e) { }
+					$.get(url, function (data) {
+						localStorage.setItem(url, JSON.stringify([data.length, data]))
+					});
+				}
+			}
+		}
+		[
+			'/js/svg.js',
+			'/js/jquery.qtip.min.js'
+		].forEach(function (src) {
+			var content=$("#content");
+			parse:{try {
+				if (localStorage && localStorage.getItem(src)) {
+					var theData = JSON.parse(localStorage.getItem(src));
+					if (theData[1].length == theData[0]) {
+						content.append($("<script>" + theData[1] + "<\/script>"));
+						break parse;
+					}
+				}
+			} catch (e) {}
+				content.append($("<script src=\"" + src + "\"><\/script>"));
+				downloadScript(src);
+			}
+		})
+	</script>
+	<link rel="stylesheet" type="text/css" href="/css/jquery.qtip.min.css">
+	<div class="tabs">
+		<ul class="tab-links">
+			<li class="active"><a class="autoexempt" href="/data?panel=First+Event">First Event</a>
+			</li>
+			<li><a class="autoexempt" href="/data?panel=Second+Event">Second Event</a>
+			</li>
+			<li><a class="autoexempt" href="/data?panel=Third+Event">Third Event</a>
+			</li>
+			<li><a class="autoexempt" href="/data?panel=Fourth+Event">Fourth Event</a>
+			</li>
+			<li><a class="autoexempt" href="/data?panel=Fifth+Event">Fifth Event</a>
+			</li>
+		</ul>
+	</div>
+	<h1 style="display:inline;">First Event</h1>
+	<small style="display:inline;color:#333;">Hover over or tap on the event number to view time and sheet number.</small>
+	<br>
+	<br>
+	<div id="drawing"></div>
+	<script>
+		var events = {"101":{"team1":"D. Young","team2":"Hooper","winner":"D. Young","time":"8:00am Fri., 1\/29","sheet":"<br \/>Sheet 2"},"102":{"team1":"Rockenboch","team2":"T. Young","winner":"T. Young","time":"8:00am Fri., 1\/29","sheet":"<br \/>Sheet 5"},"103":{"team1":"Boyle","team2":"Anderson","winner":"Boyle","time":"8:00am Fri., 1\/29","sheet":"<br \/>Sheet 3"},"104":{"team1":"O'Brien","team2":"Clingan","winner":"O'Brien","time":"8:00am Fri., 1\/29","sheet":"<br \/>Sheet 4"},"105":{"team1":"Carcione","team2":"Simpson","winner":"Carcione","time":"10:15am Fri., 1\/29","sheet":"<br \/>Sheet 4"},"106":{"team1":"Scott","team2":"Bemis","winner":"Scott","time":"10:15am Fri., 1\/29","sheet":"<br \/>Sheet 1"},"107":{"team1":"Pintar","team2":"Hulme","winner":"Pintar","time":"10:15am Fri., 1\/29","sheet":"<br \/>Sheet 5"},"108":{"team1":"Bennett","team2":"Hozjan","winner":"Hozjan","time":"10:15am Fri., 1\/29","sheet":"<br \/>Sheet 3"},"109":{"team1":"Buchanan","team2":"Savani","winner":"Buchanan","time":"12:30pm Fri., 1\/29","sheet":"<br \/>Sheet 3"},"110":{"team1":"Borland","team2":"Watson","winner":"Borland","time":"12:30pm Fri., 1\/29","sheet":"<br \/>Sheet 1"},"111":{"team1":"Negus","team2":"Curtis","winner":"Curtis","time":"10:15am Fri., 1\/29","sheet":"<br \/>Sheet 2"},"112":{"team1":"Hicks","team2":"Kearney","winner":"Hicks","time":"12:30pm Fri., 1\/29","sheet":"<br \/>Sheet 2"},"113":{"team1":"Peckinpaugh","team2":"BYE","winner":"Peckinpaugh","time":"","sheet":""},"114":{"team1":"Wallace","team2":"BYE","winner":"Wallace","time":"","sheet":""},"115":{"team1":"Mercer","team2":"BYE","winner":"Mercer","time":"","sheet":""},"116":{"team1":"Bellamy","team2":"BYE","winner":"Bellamy","time":"","sheet":""},"121":{"team1":"D. Young","team2":"T. Young","winner":"D. Young","time":"12:30pm Fri., 1\/29","sheet":"<br \/>Sheet 4"},"122":{"team1":"Boyle","team2":"O'Brien","winner":"Boyle","time":"12:30pm Fri., 1\/29","sheet":"<br \/>Sheet 5"},"123":{"team1":"Carcione","team2":"Scott","winner":"Scott","time":"3:00pm Fri., 1\/29","sheet":"<br \/>Sheet 3"},"124":{"team1":"Pintar","team2":"Hozjan","winner":"Pintar","time":"3:00pm Fri., 1\/29","sheet":"<br \/>Sheet 4"},"125":{"team1":"Buchanan","team2":"Borland","winner":"Buchanan","time":"5:15pm Fri., 1\/29","sheet":"<br \/>Sheet 2"},"126":{"team1":"Curtis","team2":"Hicks","winner":"Curtis","time":"5:15pm Fri., 1\/29","sheet":"<br \/>Sheet 3"},"127":{"team1":"Peckinpaugh","team2":"Wallace","winner":"Wallace","time":"3:00pm Fri., 1\/29","sheet":"<br \/>Sheet 2"},"128":{"team1":"Mercer","team2":"Bellamy","winner":"Mercer","time":"3:00pm Fri., 1\/29","sheet":"<br \/>Sheet 5"},"131":{"team1":"D. Young","team2":"Boyle","winner":"D. Young","time":"10:15am Sat., 1\/30","sheet":"<br \/>Sheet 1"},"132":{"team1":"Scott","team2":"Pintar","winner":"Scott","time":"10:15am Sat., 1\/30","sheet":"<br \/>Sheet 2"},"133":{"team1":"Buchanan","team2":"Curtis","winner":"Curtis","time":"8:00am Sat., 1\/30","sheet":"<br \/>Sheet 1"},"134":{"team1":"Wallace","team2":"Mercer","winner":"Wallace","time":"7:30pm Fri., 1\/29","sheet":"<br \/>Sheet 3"},"141":{"team1":"D. Young","team2":"Scott","winner":"D. Young","time":"3:00pm Sat., 1\/30","sheet":"<br \/>Sheet 4"},"142":{"team1":"Curtis","team2":"Wallace","winner":"Curtis","time":"12:45pm Sat., 1\/30","sheet":"<br \/>Sheet 4"},"161":{"team1":"D. Young","team2":"Curtis","winner":"Curtis","time":"11:00am Sun., 1\/31","sheet":"<br \/>Sheet 3"},"151":{"team1":"Scott","team2":"Wallace","winner":"Scott","time":"11:00am Sun., 1\/31","sheet":"<br \/>Sheet 2"},"201":{"team1":"Hooper","team2":"Rockenboch","winner":"Rockenboch","time":"3:00pm Fri., 1\/29","sheet":"<br \/>Sheet 1"},"202":{"team1":"Anderson","team2":"Clingan","winner":"Anderson","time":"5:15pm Fri., 1\/29","sheet":"<br \/>Sheet 1"},"203":{"team1":"Simpson","team2":"Bemis","winner":"Simpson","time":"5:15pm Fri., 1\/29","sheet":"<br \/>Sheet 5"},"204":{"team1":"Hulme","team2":"Bennett","winner":"Bennett","time":"5:15pm Fri., 1\/29","sheet":"<br \/>Sheet 4"},"205":{"team1":"Peckinpaugh","team2":"Bellamy","winner":"Peckinpaugh","time":"7:30pm Fri., 1\/29","sheet":"<br \/>Sheet 1"},"206":{"team1":"Savani","team2":"Watson","winner":"Watson","time":"7:30pm Fri., 1\/29","sheet":"<br \/>Sheet 2"},"207":{"team1":"Negus","team2":"BYE","winner":"Negus","time":"","sheet":""},"208":{"team1":"Kearney","team2":"BYE","winner":"Kearney","time":"","sheet":""},"211":{"team1":"Rockenboch","team2":"Bennett","winner":"Anderson","time":"10:15am Sat., 1\/30","sheet":"<br \/>Sheet 4"},"212":{"team1":"Simpson","team2":"Bennett","winner":"Bennett","time":"10:15am Sat., 1\/30","sheet":"<br \/>Sheet 3"},"213":{"team1":"Peckinpaugh","team2":"Watson","winner":"Watson","time":"8:00am Sat., 1\/30","sheet":"<br \/>Sheet 4"},"214":{"team1":"Negus","team2":"Kearney","winner":"Kearney","time":"8:00am Sat., 1\/30","sheet":"<br \/>Sheet 3"},"221":{"team1":"Anderson","team2":"Bennett","winner":"Anderson","time":"3:00pm Sat., 1\/30","sheet":"<br \/>Sheet 2"},"222":{"team1":"Watson","team2":"Kearney","winner":"Watson","time":"12:45pm Sat., 1\/30","sheet":"<br \/>Sheet 2"},"231":{"team1":"Anderson","team2":"Watson","winner":"Watson","time":"11:00am Sun., 1\/31","sheet":"<br \/>Sheet 4"},"301":{"team1":"T. Young","team2":"BYE","winner":"T. Young","time":"","sheet":""},"302":{"team1":"Carcione","team2":"Hozjan","winner":"Hozjan","time":"8:00am Sat., 1\/30","sheet":"<br \/>Sheet 5"},"303":{"team1":"Borland","team2":"Hicks","winner":"Borland","time":"10:15am Sat., 1\/30","sheet":"<br \/>Sheet 5"},"304":{"team1":"O'Brien","team2":"Mercer","winner":"Mercer","time":"8:00am Sat., 1\/30","sheet":"<br \/>Sheet 2"},"311":{"team1":"T. Young","team2":"Hozjan","winner":"Hozjan","time":"12:45pm Sat., 1\/30","sheet":"<br \/>Sheet 3"},"312":{"team1":"Borland","team2":"Mercer","winner":"Mercer","time":"3:00pm Sat., 1\/30","sheet":"<br \/>Sheet 3"},"321":{"team1":"Hozjan","team2":"Mercer","winner":"Mercer","time":"11:00am Sun., 1\/31","sheet":"<br \/>Sheet 1"},"401":{"team1":"Hooper","team2":"Buchanan","winner":"Hooper","time":"12:45pm Sat., 1\/30","sheet":"<br \/>Sheet 5"},"402":{"team1":"Bemis","team2":"Hulme","winner":"Hulme","time":"12:45pm Sat., 1\/30","sheet":"<br \/>Sheet 1"},"403":{"team1":"Bellamy","team2":"Savani","winner":"Bellamy","time":"3:00pm Sat., 1\/30","sheet":"<br \/>Sheet 1"},"404":{"team1":"Clingan","team2":"Negus","winner":"Negus","time":"3:00pm Sat., 1\/30","sheet":"<br \/>Sheet 5"},"411":{"team1":"Hooper","team2":"Hulme","winner":"Hulme","time":"8:00am Sun., 1\/31","sheet":"<br \/>Sheet 2"},"412":{"team1":"Bellamy","team2":"Negus","winner":"Negus","time":"8:00am Sun., 1\/31","sheet":"<br \/>Sheet 4"},"421":{"team1":"Hulme","team2":"Negus","winner":"Negus","time":"11:00am Sun., 1\/31","sheet":"<br \/>Sheet 5"},"501":{"team1":"BYE","team2":"BYE","winner":"Boyle","time":"7:00pm Wed., 12\/31","sheet":""},"502":{"team1":"BYE","team2":"BYE","winner":"Pintar","time":"7:00pm Wed., 12\/31","sheet":""},"511":{"team1":"Boyle","team2":"Pintar","winner":"Pintar","time":"8:00am Sun., 1\/31","sheet":"<br \/>Sheet 3"}};
+		var teams = ["D. Young","Hooper","Rockenboch","T. Young","Boyle","Anderson","O'Brien","Clingan","Carcione","Simpson","Scott","Bemis","Pintar","Hulme","Bennett","Hozjan","Buchanan","Savani","Borland","Watson","Negus","Curtis","Hicks","Kearney","Peckinpaugh","BYE","Wallace","Mercer","Bellamy"];
+		var selected = 1;
+		var text;
+		var cellWidth = 140;
+		var cellHeight = 22;
+		//$('#drawing').empty();
+		$('.tab-links>li').click(function (e) {
+			e.preventDefault();
+			console.log('click');
+			$('.tab-links .active').removeClass('active');
+			$(this).addClass('active');
+			var href = $(this).find('a').attr('href');
+			history.pushState([href, "/data"], "", href);
+			$('#content').find('h1').text($(this).text());
+			selected = $(this).index() + 1;
+			drawDraws();
+			return false;
+		});
+
+		$(document).ready(function () {
+			window.draw = SVG('drawing').size(970, 800);
+			drawDraws();
+		});
+
+		function drawDraws() {
+			console.log(draw);
+			draw.clear();
+			var current = 0;
+			var xPos = 0;
+			var oldEvent = Math.min.apply(Math, Object.keys(events)) - 1;
+			var maxCurrent = 0;
+			var timesreset = 0;
+			Object.keys(events).forEach(function (value, key) {
+				renderLoop: {
+					key = parseInt(value);
+					value = events[value];
+					if (Math.floor(key / 100) !== selected) {
+						break renderLoop;
+					}
+					if (value['team1'] === null) {
+						value['team1'] = "";
+					}
+					if (value['team2'] === null) {
+						value['team2'] = "";
+					}
+					if ((value['team2']).toLowerCase() === "bye") {
+						value['team2'] = "";
+					}
+					if (oldEvent + 1 != key) {
+						current = 18 * (Math.pow(2, timesreset + 2) - 2);
+						xPos += 200;
+						timesreset++;
+					}
+					if (key == 151) {
+						var cbak = current;
+						var xbak = xPos;
+						current = 1080;
+						xPos -= 200;
+					}
+					if ((value['team1']).toLowerCase() !== "bye") {
+						oldEvent = key;
+						draw.rect(30, cellHeight * 2).fill('#EEE').move(xPos, current);
+
+						var eve = draw.foreignObject(30, cellHeight * 2).move(xPos, current);
+						var child = eve.appendChild("a", {});
+						$(child.node['childNodes'][0])
+						//.attr('href', '/event/' + key.toString())
+								.addClass('autoexempt')
+								.attr('title', value['time'] + value['sheet']);
+						/*$(child.node['childNodes'][0]).click(function () {
+						 var url = $(this).attr('href');
+						 $.get(url, function (data) {
+
+						 }).fail(function (jqXHR) {
+
+						 });
+
+						 return false;
+						 });*/
+						if(value['time'] + value['sheet']!== "") {
+							$(child.node['childNodes'][0]).qtip({
+								style: {classes: 'qtip-dark'},
+								position: {
+									target: 'mouse',
+									adjust: {
+										mouse: true
+									}
+								},
+								content: {
+									text: value['time'] + value['sheet']
+								}
+							});
+						}
+						$(child.node['childNodes'][0]).append($("<div>")).children().text(key.toString()).addClass("EventNumber");
+						$(eve.appendChild("div").node['childNodes'][1])
+								.addClass("EventNumberBorder");
+
+					}
+					for (var j = 1; j < 3; j++) {
+						if ((value['team1']).toLowerCase() !== "bye") {
+							var color = '#EEE';
+							if (value['team' + (j.toString())] == value['winner'] && (key == 151 || key == 161)) {
+								color = '#da0';
+							}
+							draw.rect(cellWidth, cellHeight).fill(color).move(xPos + 30, current);
+
+							var fobj = draw.foreignObject(cellWidth, cellHeight + 1).move(xPos + 30, current).appendChild("a", {});
+							$(fobj.node['childNodes'][0]).addClass('autoexempt');
+							$(fobj.node['childNodes'][0]).append($('<div>')).children().text(value['team' + (j.toString())]);
+							if ((key * 2 + (j - 1)) % 2 == 0) {
+								$(fobj.appendChild('div').node['childNodes'][1]).addClass("borderTeam")
+							}
+						}
+						current += (key * 2 + (j - 1)) % 2 == 1 ? (9 * Math.pow(2, timesreset + 3) - 22) : cellHeight;
+						if (current > maxCurrent && (key * 2 + (j - 1)) % 2 == 0) {
+							maxCurrent = current + 22;
+						}
+					}
+					if (key == 151) {
+						current = cbak;
+						xPos = xbak - 200;
+						if (current > maxCurrent && (key * 2 + (j - 1)) % 2 == 0) {
+							maxCurrent = current + 22;
+						}
+						timesreset--;
+					}
+				}
+			});
+			$('#drawing>svg').attr("height", maxCurrent);
+		}
+
+	</script>
+</div>

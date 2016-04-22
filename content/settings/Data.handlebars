@@ -1,0 +1,13 @@
+<link rel='stylesheet' type='text/css' href='css/dropzone.css'/>
+<script src="/js/dropzone.js"></script>
+<form action="/upload?dest=draws" class="dropzone" id="draws-spreadsheet">
+	<div class="fallback">
+		<input name="file" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+	</div>
+</form>
+<script>
+	Dropzone.options.drawsSpreadsheet = {
+		maxFilesize: 1,
+		acceptedFiles: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	}
+</script>
