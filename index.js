@@ -24,7 +24,7 @@ nconf.argv()
 			port: 27017
 		},
 		ssl: false,
-		proxy: false
+		port: 2000
 	});
 if (nconf.get('ssl')) {
 	http = require('https').createServer(nconf.get('ssl'), app);
@@ -72,8 +72,8 @@ app.use((req, res, next) => {
 		next();
 	});
 });
-http.listen(2000, () => {
-	console.log('listening on *:2000');
+http.listen(nconf.get('port'), () => {
+	console.log('listening on *:'+nconf.get('port'));
 });
 function checkRaw(checkPath, callback) {
 	async.parallel([
