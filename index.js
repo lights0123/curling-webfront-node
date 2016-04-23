@@ -2,6 +2,7 @@ const fs = require('fs');
 const express = require('express');
 const app = express();
 var http;
+var travisHandler;
 const path = require('path');
 const compression = require('compression');
 const session = require('express-session');
@@ -14,6 +15,8 @@ const nconf = require('nconf');
 const helpers = require('./helpers');
 const getTemplate = helpers.getTemplate;
 const doError = helpers.doError;
+const createTravisHandler = require('./travis-webhook');
+const childProcess = require('child_process');
 nconf.argv()
 	.env()
 	.file({file: 'config.json'})
@@ -24,13 +27,19 @@ nconf.argv()
 			port: 27017
 		},
 		ssl: false,
-		port: 2000
+		port: 2000,
+		deploy:{
+			"travis-token": null,
+			script: ""
+		}
 	});
+
 if (nconf.get('ssl')) {
 	http = require('https').createServer(nconf.get('ssl'), app);
 } else {
 	http = require('http').createServer(app);
 }
+
 app.set('trust proxy', 'loopback');
 app.use((req, res, next)=> {
 	req.path = path.normalize(req.path);
@@ -56,6 +65,22 @@ app.use(session({
 	saveUninitialized: false
 }));
 app.use(compression());
+
+if (nconf.get('travis-token') !== null) {
+	if (nconf.get('travis-token') === "") {
+		travisHandler = createTravisHandler();
+		app.use('/deploy',travisHandler);
+	} else {
+		travisHandler = createTravisHandler(nconf.get('travis-token'));
+		app.use('/deploy',travisHandler);
+	}
+	travisHandler.on('success', data=> {
+		if(data.type==='push'&&data.branch==='master'){
+			childProcess.exec(nconf.get('deploy:script'))
+		}
+	});
+}
+
 app.use(require('./routes/users'));
 app.use(require('./routes/spreadsheet'));
 app.use(require('./content'));
@@ -73,7 +98,7 @@ app.use((req, res, next) => {
 	});
 });
 http.listen(nconf.get('port'), () => {
-	console.log('listening on *:'+nconf.get('port'));
+	console.log('listening on *:' + nconf.get('port'));
 });
 function checkRaw(checkPath, callback) {
 	async.parallel([
