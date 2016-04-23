@@ -1,2 +1,0 @@
-CSC Curling | Events
-<?php
