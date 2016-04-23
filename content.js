@@ -6,31 +6,29 @@ const helpers = require('./helpers');
 const getTemplate = helpers.getTemplate;
 const doError = helpers.doError;
 const formatPage = helpers.formatPage;
-exports.register = () => {
-	return (req, res, next) => {
-		var reqURI = req.path;
-		async.waterfall([
-			callback=> {
-				callback(get(reqURI, req, res) ? true : null);
-			},
-			callback=> {
-				callback(get(path.normalize(reqURI + "/index"), req, res) ? true : null);
-			}
-		], err=> err || next());
-		function get(reqURI, req, res) {
-			if (Object.keys(pages).indexOf(reqURI) !== -1) {
-				pages[reqURI](req, con=> {
-					if (!(con.format === false)) {
-						res.set({'content-type': 'text/html; charset=UTF-8'});
-						res.end(formatPage(req, reqURI, con.title, con.content));
-					} else {
-						res.set({'content-type': 'text/html; charset=UTF-8'});
-						res.end(con.content);
-					}
-				});
-				return true;
-			} else return false;
+module.exports = (req, res, next) => {
+	var reqURI = req.path;
+	async.waterfall([
+		callback=> {
+			callback(get(reqURI, req, res) ? true : null);
+		},
+		callback=> {
+			callback(get(path.normalize(reqURI + "/index"), req, res) ? true : null);
 		}
+	], err=> err || next());
+	function get(reqURI, req, res) {
+		if (Object.keys(pages).indexOf(reqURI) !== -1) {
+			pages[reqURI](req, con=> {
+				if (!(con.format === false)) {
+					res.set({'content-type': 'text/html; charset=UTF-8'});
+					res.end(formatPage(req, reqURI, con.title, con.content));
+				} else {
+					res.set({'content-type': 'text/html; charset=UTF-8'});
+					res.end(con.content);
+				}
+			});
+			return true;
+		} else return false;
 	}
 };
 var pages = {

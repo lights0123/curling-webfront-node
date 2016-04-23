@@ -58,7 +58,7 @@ app.use(session({
 app.use(compression());
 app.use(require('./routes/users'));
 app.use(require('./routes/spreadsheet'));
-app.use(require('./content').register());
+app.use(require('./content'));
 app.use((req, res, next) => {
 	var reqURI = req.path;
 	var checkPath = path.normalize("public/" + reqURI);
