@@ -1,0 +1,13 @@
+services:
+  - mongodb
+language: node_js
+node_js:
+  - "5"
+  - "4"
+env:
+  - CXX=g++-4.8
+notifications:
+  webhooks:
+    urls:
+      - https://curlcsc.com/deploy
+    on_success: always
