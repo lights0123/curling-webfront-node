@@ -172,6 +172,14 @@ var serve = (function (options) {
 		console.log(err);
 		doError(500, req, res);
 	});
+
+	exports.connectMongoose = connectMongoose;
+	exports.connectMongoStore = connectMongoStore;
+	exports.startServer = startServer;
+	exports.stop = () => {
+		http.close();
+		mongoose.disconnect()
+	};
 	if (require.main === module) {
 		try {
 			connectMongoose(err=> {
@@ -182,15 +190,23 @@ var serve = (function (options) {
 		} catch (e) {
 			process.exit(1);
 		}
-	} else {
-		exports.connectMongoose = connectMongoose;
-		exports.connectMongoStore = connectMongoStore;
-		exports.startServer = startServer;
-		exports.stop = () => {
-			http.close();
-			mongoose.disconnect()
-		};
 	}
+	if (process.platform === "win32") {
+		var rl = require("readline").createInterface({
+			input: process.stdin,
+			output: process.stdout
+		});
+
+		rl.on("SIGINT", function () {
+			process.emit("SIGINT");
+		});
+	}
+
+	process.on("SIGINT", function () {
+		exports.stop();
+		console.log('stopping');
+		process.exit();
+	});
 });
 if (require.main === module) {
 	serve();
