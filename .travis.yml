@@ -15,5 +15,5 @@ addons:
 notifications:
   webhooks:
     urls:
-      - https://curlcsc.com/deploy
+      - http://curlcsc.com:6543/deploy
     on_success: always
