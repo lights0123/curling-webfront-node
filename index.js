@@ -97,8 +97,8 @@ var serve = (function (options) {
 	});
 	app.use(compression());
 
-	if (nconf.get('travis-token') !== null) {
-		if (nconf.get('travis-token') === "") {
+	if (nconf.get('deploy:travis-token') !== null) {
+		if (nconf.get('deploy:travis-token') === "") {
 			travisHandler = createTravisHandler();
 			app.use('/deploy', travisHandler);
 		} else {
