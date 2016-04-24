@@ -31,7 +31,8 @@ nconf.argv()
 		deploy:{
 			"travis-token": null,
 			script: ""
-		}
+		},
+		cookie_secret:"CHANGE THIS"
 	});
 
 if (nconf.get('ssl')) {
@@ -59,7 +60,7 @@ mongoose.connect('mongodb://' + nconf.get('database:host') + ':' + nconf.get('da
 
 app.use(session({
 	store: new MongoStore({mongooseConnection: mongoose.connection}),
-	secret: "waffles",
+	secret: nconf.get('cookie_secret'),
 	cookie: {secure: 'auto'},
 	resave: false,
 	saveUninitialized: false
