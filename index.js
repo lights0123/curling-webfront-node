@@ -36,7 +36,12 @@ nconf.argv()
 	});
 
 if (nconf.get('ssl')) {
-	http = require('https').createServer(nconf.get('ssl'), app);
+	var SSLSettings = nconf.get('ssl');
+	var newSSLSettings = {};
+	if (SSLSettings.key) newSSLSettings.key = fs.readFileSync(SSLSettings.key);
+	if (SSLSettings.cert) newSSLSettings.cert = fs.readFileSync(SSLSettings.cert);
+	if (SSLSettings.pfx) newSSLSettings.pfx = fs.readFileSync(SSLSettings.pfx);
+	http = require('https').createServer(Object.assign(SSLSettings, newSSLSettings), app);
 } else {
 	http = require('http').createServer(app);
 }
