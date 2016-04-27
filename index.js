@@ -75,13 +75,6 @@ var serve = (function (options) {
 		});
 	}
 
-	var sessionHandler = session({
-		secret: nconf.get('cookie_secret'),
-		cookie: {secure: 'auto'},
-		resave: false,
-		saveUninitialized: false
-	});
-
 	function connectMongoStore() {
 		sessionHandler = session({
 			store: new MongoStore({mongooseConnection: mongoose.connection}),
@@ -92,9 +85,7 @@ var serve = (function (options) {
 		});
 	}
 
-	app.use((req, res, next)=> {
-		sessionHandler(req, res, next);
-	});
+	app.use((req, res, next)=>sessionHandler(req, res, next));
 	app.use(compression());
 
 	if (nconf.get('deploy:travis-token') !== null) {
@@ -210,6 +201,7 @@ var serve = (function (options) {
 });
 if (require.main === module) {
 	serve();
+	if(process.send) process.send('online');
 }else{
 	exports.init = function(options){
 		serve(options);
