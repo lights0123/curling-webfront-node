@@ -143,7 +143,6 @@ exports.methodNA = router => {
 			var match = false;
 			routes.forEach(obj=> {
 				if (obj.regexp.test(req._parsedUrl.pathname)) {
-					console.log(obj.regexp,req._parsedUrl.pathname);
 					match = true;
 					var methodMatch = false;
 					if (obj.methods.indexOf("_all") !== -1

@@ -66,7 +66,6 @@ function create(token) {
 			else return false;
 		});
 		if (status === null) return hasError('An invalid status message was sent.');
-		console.log(status);
 		res.json({ok: true});
 
 		handler.emit('*', result);

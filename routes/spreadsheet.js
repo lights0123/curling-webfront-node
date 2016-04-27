@@ -30,10 +30,9 @@ var data = {
 router.route('/upload')
 	.post((req, res, next)=> {
 		if ("user" in req.session) {
-			req.session.user.perm.push('Upload Spreadsheets');
 			if (req.session.user.perm.indexOf('Upload Spreadsheets') !== -1) {
 				upload(req, res, function (err) {
-					if (err) return console.log(err), doError(500, req, res);
+					if (err) return console.error(err), doError(500, req, res);
 					var workbook = XLSX.read(req.file.buffer);
 					var s = workbook.Sheets['Data'];
 					var encounteredBlank = false;

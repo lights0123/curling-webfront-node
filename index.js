@@ -160,7 +160,7 @@ var serve = (function (options) {
 		doError(404, req, res);
 	});
 	app.use((err, req, res, next) => {
-		console.log(err);
+		console.error(err);
 		doError(500, req, res);
 	});
 
