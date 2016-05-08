@@ -94,11 +94,15 @@ router.route('/signup')
 				};
 				var doErrors = true;
 				if (error.length === 0) {
-					var user = new User({
-						username: req.body.username,
-						password: req.body.password,
-						email: req.body.email
-					});
+					try{
+						var user = new User({
+							username: req.body.username.toString(),
+							password: req.body.password.toString(),
+							email: req.body.email.toString()
+						});
+					}catch(e){
+						cb(new TypeError("Expected a variable that could be turned into a string"));
+					}
 					doErrors = false;
 					user.save(function (err) {
 						if (!err) {

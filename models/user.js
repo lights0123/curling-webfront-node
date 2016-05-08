@@ -62,7 +62,11 @@ var reasons = UserSchema.statics.failedLogin = {
 };
 
 UserSchema.statics.getAuthenticated = function (username, password, cb) {
-
+	try{
+		username = username.toString();
+	}catch(e){
+		cb(new TypeError("Expected a variable that could be turned into a string"));
+	}
 	this.findOne({$or: [{username: username}, {email: username}]}, function (err, user) {
 		if (err) return cb(err);
 
