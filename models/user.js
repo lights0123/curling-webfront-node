@@ -25,7 +25,7 @@ UserSchema.pre('save', function (next) {
 	// only hash the password if it has been modified (or is new)
 	if (!user.isModified('password')) return next();
 
-	scrypt.kdf(new Buffer(user.password), {N: 68, r: 8, p: 1}, (err, hash)=> {
+	scrypt.kdf(Buffer.from(user.password), {N: 68, r: 8, p: 1}, (err, hash)=> {
 		if (err) return next(err);
 		user.password = hash.toString('base64');
 		next();
@@ -33,7 +33,7 @@ UserSchema.pre('save', function (next) {
 });
 
 UserSchema.methods.verifyPassword = function (candidatePassword, cb) {
-	scrypt.verifyKdf(new Buffer((this.password), "base64"), new Buffer(candidatePassword), function (err, isMatch) {
+	scrypt.verifyKdf(Buffer.from((this.password), "base64"), Buffer.from(candidatePassword), function (err, isMatch) {
 		if (err) return cb(err);
 		cb(null, isMatch);
 	});
