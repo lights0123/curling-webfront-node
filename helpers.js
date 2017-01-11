@@ -115,7 +115,13 @@ var formatPage = exports.formatPage = (req, reqURI, title, content) => {
 		if (Object.keys(menu).indexOf(reqURI) !== -1) {
 			menu[reqURI][1].push('active');
 		}
-		return headerTemplate({title: title, menu: menu, content: content, serviceWorker: req.secure});
+		var originalYear = 2015;
+		var templateParameters = {title: title, menu: menu, content: content, serviceWorker: req.secure, originalYear: originalYear};
+		if(new Date().getFullYear() !== originalYear){
+			templateParameters.showSecondYear = true;
+			templateParameters.year = new Date().getFullYear();
+		}
+		return headerTemplate(templateParameters);
 	} else {
 		return title + "\n" + content;
 	}
