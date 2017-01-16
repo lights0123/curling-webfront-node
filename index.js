@@ -93,7 +93,7 @@ var serve = (function (options) {
 			travisHandler = createTravisHandler();
 			app.use('/deploy', travisHandler);
 		} else {
-			travisHandler = createTravisHandler(nconf.get('travis-token'));
+			travisHandler = createTravisHandler(nconf.get('deploy:travis-token'));
 			app.use('/deploy', travisHandler);
 		}
 		travisHandler.on('success', data=> {
