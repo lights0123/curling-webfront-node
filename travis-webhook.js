@@ -48,7 +48,7 @@ function create(publicKey) {
 		}
 
 		if (!key.verify(JSON.parse(req.body.payload), sig, 'base64', 'base64'))
-			return console.log('Signed payload does not match signature'),hasError('Signed payload does not match signature');
+			return console.log('Signed payload does not match signature'), hasError('Signed payload does not match signature');
 
 		var result;
 		try {
@@ -65,7 +65,7 @@ function create(publicKey) {
 			}
 			else return false;
 		});
-		if (status === null) return console.log('An invalid status message was sent.'),hasError('An invalid status message was sent.');
+		if (status === null) return console.log('An invalid status message was sent.'), hasError('An invalid status message was sent.');
 		res.json({ok: true});
 
 		handler.emit('*', result);
