@@ -35,9 +35,11 @@ function create(publicKey) {
 
 		var sig = req.headers['signature'];
 		if (!sig) {
+			console.log('No Signature found on request');
 			return hasError('No Signature found on request');
 		}
 		if (!repoSlug) {
+			console.log('No repo found on request');
 			return hasError('No repo found on request');
 		}
 		var key = new NodeRSA(publicKey, {signingScheme: 'sha1'});
@@ -48,7 +50,7 @@ function create(publicKey) {
 		}
 
 		if (!key.verify(JSON.parse(req.body.payload), sig, 'base64', 'base64'))
-			return hasError('Signed payload does not match signature');
+			return console.log('Signed payload does not match signature'),hasError('Signed payload does not match signature');
 
 		var result;
 		try {
@@ -65,11 +67,11 @@ function create(publicKey) {
 			}
 			else return false;
 		});
-		if (status === null) return hasError('An invalid status message was sent.');
+		if (status === null) return console.log('An invalid status message was sent.'),hasError('An invalid status message was sent.');
 		res.json({ok: true});
 
 		handler.emit('*', result);
-		handler.emit(event, result);
+		handler.emit(status, result);
 	};
 	handler.emitter = new EventEmitter();
 	bindEmitter(handler, handler.emitter);
