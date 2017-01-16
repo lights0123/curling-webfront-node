@@ -6,10 +6,10 @@
 }
 
 @font-face {
-	font-family: 'Myriad Pro Regular';
+	font-family: 'PT Sans Regular';
 	font-style: normal;
 	font-weight: normal;
-	src: local('Myriad Pro Regular'), url('/fonts/MYRIADPRO-REGULAR.woff') format('woff');
+	src: local('PT Sans Regular'), url('/fonts/PT_Sans-Web-Regular.woff') format('woff');
 }
 
 /* Thanks to http://cssmenumaker.com for the code */
@@ -279,7 +279,7 @@ body {
 	width: 60%;
 	margin-left: auto;
 	margin-right: auto;
-	font-family: 'Myriad Pro Regular';
+	font-family: 'PT Sans Regular';
 	flex: 1;
 }
 
@@ -338,7 +338,7 @@ a {
 	border-top: none;
 	font-size: 30px;
 	text-align: center;
-	font-family: 'Myriad Pro Regular';
+	font-family: 'PT Sans Regular';
 }
 
 #signup_form input:first-child {
@@ -381,7 +381,7 @@ small a {
 }
 
 svg div {
-	font-family: Arial, 'Myriad Pro Regular', sans-serif;
+	font-family: Arial, 'PT Sans Regular', sans-serif;
 	font-size: 14px;
 	padding: 3px;
 	width: 134px;
