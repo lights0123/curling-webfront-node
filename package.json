@@ -1,29 +1,30 @@
 {
-	"name": "curling-webfront-node",
-	"version": "0.0.0",
-	"private": true,
-	"dependencies": {
-		"async": "^2.1.4",
-		"body-parser": "^1.15.0",
-		"compression": "^1.6.1",
-		"connect-mongo": "^1.1.0",
-		"express": "^4.10.2",
-		"express-session": "^1.13.0",
-		"handlebars": "^4.0.5",
-		"moment": "^2.12.0",
-		"mongoose": "^4.4.4",
-		"multer": "^1.1.0",
-		"nconf": "^0.8.4",
-		"scrypt": "^6.0.2",
-		"xlsx": "^0.8.0"
-	},
-	"devDependencies": {
-		"chai": "^3.5.0",
-		"mocha": "^3.2.0",
-		"request": "^2.72.0"
-	},
-	"scripts": {
-		"start": "node index.js",
-		"test": "mocha --recursive test"
-	}
+  "name": "curling-webfront-node",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "async": "^2.1.4",
+    "body-parser": "^1.15.0",
+    "compression": "^1.6.1",
+    "connect-mongo": "^1.1.0",
+    "express": "^4.10.2",
+    "express-session": "^1.13.0",
+    "handlebars": "^4.0.5",
+    "moment": "^2.12.0",
+    "mongoose": "^4.4.4",
+    "multer": "^1.1.0",
+    "nconf": "^0.8.4",
+    "node-rsa": "^0.4.2",
+    "scrypt": "^6.0.2",
+    "xlsx": "^0.8.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "request": "^2.72.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha --recursive test"
+  }
 }
