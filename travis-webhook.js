@@ -31,6 +31,9 @@ function signRequest(repoSlug, userToken) {
 function create(publicKey) {
 
 	var handler = function (req, res, next) {
+		var repoSlug = req.headers['travis-repo-slug'];
+
+		var sig = req.headers['signature'];
 		if (!sig) {
 			return hasError('No Signature found on request');
 		}
