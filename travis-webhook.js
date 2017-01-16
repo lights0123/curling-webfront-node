@@ -27,6 +27,8 @@ function bindEmitter(obj, emitter) {
 function create(publicKey) {
 
 	var handler = function (req, res, next) {
+		console.log(req.body.payload);
+		console.log(req.headers);
 		var repoSlug = req.headers['travis-repo-slug'];
 
 		var sig = req.headers['signature'];
