@@ -24,10 +24,6 @@ function bindEmitter(obj, emitter) {
 	});
 }
 
-function signRequest(repoSlug, userToken) {
-	return crypto.createHash('sha256').update(repoSlug + userToken).digest('hex');
-}
-
 function create(publicKey) {
 
 	var handler = function (req, res, next) {
