@@ -104,7 +104,7 @@ router.route(['/data', '/data/:panel'])
 		panels[selected].active = true;
 		dataStorage.getLatestYear((err, data) => {
 			res.set({'content-type': 'text/html; charset=UTF-8'});
-			if (!err) {
+			if (!err && data) {
 				res.end(formatPage(req, req.path, "View Draws", getTemplate('content/data.handlebars')({
 					data: JSON.stringify(data[0].data),
 					selected: selected,
