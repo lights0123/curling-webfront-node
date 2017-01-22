@@ -40,15 +40,17 @@ function create(publicKey) {
 			console.log('No repo found on request');
 			return hasError('No repo found on request');
 		}
-		var key = new NodeRSA(publicKey, {signingScheme: 'sha1'});
+		console.log(publicKey);
 
 		function hasError(msg) {
 			var err = new Error(msg);
 			next(err);
 		}
-
-		if (!key.verify(JSON.parse(req.body.payload), sig, 'base64', 'base64'))
-			return console.log('Signed payload does not match signature'), hasError('Signed payload does not match signature');
+		//if(publicKey) {
+			var key = new NodeRSA(publicKey, {signingScheme: 'sha1'});
+			if (!key.verify(JSON.parse(req.body.payload), sig, 'base64', 'base64'))
+				return console.log('Signed payload does not match signature'), hasError('Signed payload does not match signature');
+		//}
 
 		var result;
 		try {

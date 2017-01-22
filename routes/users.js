@@ -215,9 +215,31 @@ router.route('/login')
 			});
 		} else next();
 	});
-router.route('/settings')
+router.route(['/settings', '/settings/:panel'])
 	.get((req, res, next)=> {
-		if ("user" in req.session) next(); else redirect(req, res, "/login");
+		if ("user" in req.session) {
+			var query = req.params.panel || req.query.panel || "General";
+			var panels = [
+				{
+					name: "General",
+					content: getTemplate('content/settings/General.handlebars')(),
+					selected: false
+				},
+				{
+					name: "Data",
+					content: getTemplate('content/settings/Data.handlebars')(),
+					selected: false
+				}
+			];
+			var match = false;
+			panels.forEach(obj => {
+				if (query.toUpperCase() === obj.name.toUpperCase()) obj.selected = true,
+					match = true;
+			});
+			if (!match) panels[0].selected = true;
+			res.set({'content-type': 'text/html; charset=UTF-8'});
+			res.end(formatPage(req, req.path, "Settings", getTemplate('content/settings.handlebars')({panels: panels})));
+		} else redirect(req, res, "/login");
 	});
 
 

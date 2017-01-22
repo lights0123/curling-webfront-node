@@ -19,7 +19,7 @@ Handlebars.registerHelper("concat", function (context, options) { //From https:/
 		return context[0] + sep + " " + context[1] + conj + context[2];
 	}
 	for (var i = 0; i < len; i++) {
-		if (i == len - 1) {
+		if (i === len - 1) {
 			out += sep + conj;
 		} else if (i > 0) {
 			out += sep + " "
