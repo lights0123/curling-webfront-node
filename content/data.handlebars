@@ -130,7 +130,7 @@
 							.addClass('autoexempt')
 							.click(popup);
 					if (value['time'] + value['sheet'] !== "") {
-						/*$(child.node['childNodes'][0]).qtip({
+						$(child.node['childNodes'][0]).qtip({
 							style: {classes: 'qtip-dark clickthrough'},
 							position: {
 								target: 'mouse',
@@ -141,7 +141,7 @@
 							content: {
 								text: value['time'] + "<br />" + value['sheet']
 							}
-						});*/
+						});
 					}
 					$(child.node['childNodes'][0]).append($("<div>")).children().text(key.toString()).addClass("EventNumber");
 					$(eve.appendChild("div").node['childNodes'][1])
