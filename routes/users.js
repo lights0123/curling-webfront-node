@@ -224,13 +224,16 @@ router.route(['/settings', '/settings/:panel'])
 					name: "General",
 					content: getTemplate('content/settings/General.handlebars')(),
 					selected: false
-				},
-				{
-					name: "Data",
-					content: getTemplate('content/settings/Data.handlebars')(),
-					selected: false
 				}
 			];
+			if(req.session.user.perm.indexOf('Upload Spreadsheets') !== -1){
+				panels.push(
+					{
+						name: "Data",
+						content: getTemplate('content/settings/Data.handlebars')(),
+						selected: false
+					})
+			}
 			var match = false;
 			panels.forEach(obj => {
 				if (query.toUpperCase() === obj.name.toUpperCase()) obj.selected = true,
