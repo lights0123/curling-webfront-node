@@ -18,6 +18,7 @@
 		}
 		[
 			'/js/svg.js',
+			'/js/pwgmodal.min.js',
 			'/js/jquery.qtip.min.js'
 		].forEach(function (src) {
 			var content = $("#content");
@@ -38,11 +39,12 @@
 		})
 	</script>
 	<link rel="stylesheet" type="text/css" href="/css/jquery.qtip.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/pwgmodal.min.css">
 	<div class="tabs">
 		<ul class="tab-links">
 			{{#each panels}}
-			<li class="{{#if active}}active{{/if}}"><a class="autoexempt" href="/data/{{@key}}">{{name}} Event</a>
-			</li>
+				<li class="{{#if active}}active{{/if}}"><a class="autoexempt" href="/data/{{@key}}">{{name}} Event</a>
+				</li>
 			{{/each}}
 		</ul>
 	</div>
@@ -53,6 +55,9 @@
 	<br>
 	<div id="drawing"></div>
 	<script>
+		function htmlEntities(str) {
+			return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+		}
 		var events = {{#if data}} {{{data}}} {{else}} {} {{/if}};
 		var selected = {{selected}};
 		var text;
@@ -104,26 +109,29 @@
 						xPos -= 200;
 					}
 					oldEvent = key;
+					var regexTo = /^(?:.*to)?(.*)$/i;
+					var popup = function(e){
+						console.log(e);
+						$('.clickthrough').qtip('hide');
+						var content = '<h2 class="nomargin">' + htmlEntities(value.teams[0] || "Undecided") + ' vs ' + htmlEntities(value.teams[1] || "Undecided") + '</h2>' +
+								'<br /><h3 class="nomargin">Draw Number '+key.toString()+'</h3>';
+						if(value.winner) content += '<br /><h3 class="nomargin">Winner: '+value.winner+'</h3>';
+						content += '<br /><h3 class="nomargin">Winner To: '+regexTo.exec(value.winnerTo)[1]+'</h3>';
+						content += '<br /><h3 class="nomargin">Loser To: '+regexTo.exec(value.loserTo)[1]+'</h3>';
+						$.pgwModal({
+							content: content
+						});
+						return false;
+					};
 					draw.rect(30, cellHeight * 2).fill('#EEE').move(xPos, current);
 					var eve = draw.foreignObject(30, cellHeight * 2).move(xPos, current);
 					var child = eve.appendChild("a", {});
 					$(child.node['childNodes'][0])
-					//.attr('href', '/event/' + key.toString())
 							.addClass('autoexempt')
-							.attr('title', value['time'] + value['sheet']);
-					/*$(child.node['childNodes'][0]).click(function () {
-                     var url = $(this).attr('href');
-                     $.get(url, function (data) {
-
-                     }).fail(function (jqXHR) {
-
-                     });
-
-                     return false;
-                     });*/
+							.click(popup);
 					if (value['time'] + value['sheet'] !== "") {
-						$(child.node['childNodes'][0]).qtip({
-							style: {classes: 'qtip-dark'},
+						/*$(child.node['childNodes'][0]).qtip({
+							style: {classes: 'qtip-dark clickthrough'},
 							position: {
 								target: 'mouse',
 								adjust: {
@@ -131,23 +139,23 @@
 								}
 							},
 							content: {
-								text: value['time'] + value['sheet']
+								text: value['time'] + "<br />" + value['sheet']
 							}
-						});
+						});*/
 					}
 					$(child.node['childNodes'][0]).append($("<div>")).children().text(key.toString()).addClass("EventNumber");
 					$(eve.appendChild("div").node['childNodes'][1])
 							.addClass("EventNumberBorder");
 					for (var j = 1; j < 3; j++) {
 						var color = '#EEE';
-						if (value.teams[j-1] !== '' && value.teams[j-1] === value.winner && value.winnerTo.toString().includes('1st')) {
+						if (value.teams[j - 1] !== '' && value.teams[j - 1] === value.winner && value.winnerTo.toString().includes('1st')) {
 							color = '#da0';
 						}
 						draw.rect(cellWidth, cellHeight).fill(color).move(xPos + 30, current);
 
 						var fobj = draw.foreignObject(cellWidth, cellHeight + 1).move(xPos + 30, current).appendChild("a", {});
-						$(fobj.node['childNodes'][0]).addClass('autoexempt');
-						$(fobj.node['childNodes'][0]).append($('<div>')).children().text(value.teams[j-1]);
+						$(fobj.node['childNodes'][0]).addClass('autoexempt').click(popup);
+						$(fobj.node['childNodes'][0]).append($('<div>')).children().text(value.teams[j - 1]);
 						if ((key * 2 + (j - 1)) % 2 === 0) {
 							$(fobj.appendChild('div').node['childNodes'][1]).addClass("borderTeam")
 						}

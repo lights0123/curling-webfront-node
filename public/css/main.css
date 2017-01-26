@@ -259,6 +259,7 @@
 
 body {
 	background: transparent url("/img/back.png") repeat scroll 0 0;
+	font-family: "PT Sans Regular";
 }
 
 html,
@@ -323,11 +324,11 @@ a {
 	margin-right: auto;
 }
 
-#signup_form input[type=submit]{
+#signup_form input[type=submit] {
 	border: none !important;
 }
 
-#signup_form input.error{
+#signup_form input.error {
 	border-bottom: none !important;
 }
 
@@ -350,7 +351,7 @@ a {
 	color: white;
 }
 
-#signup_form .error[for]{
+#signup_form .error[for] {
 	border: 1px solid #808080;
 	border-top: none;
 	display: block;
@@ -387,6 +388,7 @@ svg div {
 	width: 134px;
 	height: 22px;
 	overflow: hidden;
+	cursor: pointer;
 }
 
 svg .borderTeam {
@@ -455,27 +457,40 @@ li.active a, li.active a:hover {
 #drawing {
 	overflow: auto;
 }
-.drop-files-container{
+
+.drop-files-container {
 	background-color: #999;
 	width: 300px;
 	height: 300px;
 
 }
-.display-middle{
+
+.display-middle {
 	color: black;
-	display:flex;
+	display: flex;
 }
+
 .display-middle:before, .display-middle:after {
-	content:'';
-	flex:1;
-	border-bottom:groove 2px;
-	margin:auto 0.25em;
+	content: '';
+	flex: 1;
+	border-bottom: groove 2px;
+	margin: auto 0.25em;
 }
-@media(max-width:800px){
-	#content{
-		width:100%;
+
+@media (max-width: 800px) {
+	#content {
+		width: 100%;
 	}
-	#footer{
-		width:100%;
+
+	#footer {
+		width: 100%;
 	}
+}
+
+.clickthrough {
+	pointer-events: none;
+}
+
+.nomargin{
+	margin: 0;
 }

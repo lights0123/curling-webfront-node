@@ -1,7 +1,11 @@
 var staticAssets = [
 	'/img/back.png',
-	'/fonts/MYRIADPRO-REGULAR.woff',
-	'/js/svg.js'
+	'/js/jquery.qtip.min.js',
+	'/js/jquery.validate.min.js',
+	'/js/pwgmodal.min.js',
+	'/js/dropzone.js',
+	'/js/svg.js',
+	'/fonts/PT_Sans-Web-Regular.woff'
 ];
 var version = '0.1';
 var cacheName = version + '::' + 'staticAssets';
