@@ -44,12 +44,18 @@ describe('Server', function () {
 						expect(err).to.not.exist;
 						expect(res.statusCode).to.be.at.most(399);
 						fs.readFile('../content/index.handlebars', function (index) {
-							expect(resBody).to.equal(template({
+							var templateParameters = {
 								title: "Curling CSC",
 								menu: menu,
 								content: Handlebars.compile(index.toString('utf-8')),
 								serviceWorker: false
-							}));
+							};
+							var originalYear = 2015;
+							if(new Date().getFullYear() !== originalYear){
+								templateParameters.showSecondYear = true;
+								templateParameters.year = new Date().getFullYear();
+							}
+							expect(resBody).to.equal(template(templateParameters));
 						});
 						done();
 					});
