@@ -149,6 +149,9 @@
 							.addClass("EventNumberBorder");
 					for (var j = 1; j < 3; j++) {
 						var color = '#EEE';
+						if (value.teams[j - 1] !== '' && value.teams[j - 1] === value.winner) {
+							color = '#999';
+						}
 						if (value.teams[j - 1] !== '' && value.teams[j - 1] === value.winner && value.winnerTo.toString().includes('1st')) {
 							color = '#da0';
 						}
