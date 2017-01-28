@@ -114,6 +114,7 @@
 						console.log(e);
 						$('.clickthrough').qtip('hide');
 						var content = '<h2 class="nomargin">' + htmlEntities(value.teams[0] || "Undecided") + ' vs ' + htmlEntities(value.teams[1] || "Undecided") + '</h2>' +
+								'<br /><h3 class="nomargin">At '+value.time+'</h3>'+
 								'<br /><h3 class="nomargin">Draw Number '+key.toString()+'</h3>';
 						if(value.winner) content += '<br /><h3 class="nomargin">Winner: '+value.winner+'</h3>';
 						content += '<br /><h3 class="nomargin">Winner To: '+regexTo.exec(value.winnerTo)[1]+'</h3>';
@@ -148,6 +149,9 @@
 							.addClass("EventNumberBorder");
 					for (var j = 1; j < 3; j++) {
 						var color = '#EEE';
+						if (value.teams[j - 1] !== '' && value.teams[j - 1] === value.winner) {
+							color = '#BBB';
+						}
 						if (value.teams[j - 1] !== '' && value.teams[j - 1] === value.winner && value.winnerTo.toString().includes('1st')) {
 							color = '#da0';
 						}
