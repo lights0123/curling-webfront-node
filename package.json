@@ -16,7 +16,7 @@
     "nconf": "^0.8.4",
     "node-rsa": "^0.4.2",
     "scrypt": "^6.0.2",
-    "xlsx": "^0.8.3"
+    "xlsx": "^0.9.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
