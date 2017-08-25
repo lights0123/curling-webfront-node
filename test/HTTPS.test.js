@@ -12,6 +12,7 @@ describe('Server', function () {
 		var key = path.normalize(process.cwd() + "/key.key");
 		var cert = path.normalize(process.cwd() + "/cert.crt");
 		describe('Startup', function () {
+			this.timeout(5000);
 			it('should allow OpenSSL to generate an SSL certificate', function (done) {
 				childProcess.exec('openssl req -x509 -sha256 -nodes -subj "/C=US/ST=Ohio/L=h/O=h/CN=localhost" -days 365 -newkey rsa:2048 -keyout key.key -out cert.crt',
 					function (err) {
