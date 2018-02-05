@@ -1,4 +1,4 @@
-var express = require('express');
+let express = require('express');
 const async = require('async');
 const User = require('../models/user');
 const Handlebars = require('handlebars');
@@ -8,20 +8,20 @@ const doError = helpers.doError;
 const formatPage = helpers.formatPage;
 const redirect = helpers.redirect;
 const methodNA = helpers.methodNA;
-var router = express.Router();
+let router = express.Router();
 router.route('/signout')
-	.get((req, res, next)=> {
+	.get((req, res, next) => {
 		delete req.session.user;
 		redirect(req, res, "/");
 	});
 router.route('/signup')
-	.get((req, res, next)=> {
+	.get((req, res, next) => {
 		if ("user" in req.session) redirect(req, res, "/settings"); else next();
 	})
 	.post((req, res, next) => {
 		if ("user" in req.session) redirect(req, res, "/settings");
 		if ("username" in req.body || "email" in req.body || "password" in req.body) {
-			var errorMappings = {
+			let errorMappings = {
 				"password": "Please enter a password",
 				"passwordl": "Please enter no more than 1000 characters",
 				"passwords": "Passwords must be at least 6 characters",
@@ -35,9 +35,9 @@ router.route('/signup')
 				"emailt": "Sorry, but this email address is already used",
 				"dberror": "Uh-Oh, we're having an issue with our system. Please try again later"
 			};
-			var error = [];
+			let error = [];
 			async.parallel([
-				callback=> {
+				callback => {
 					if ("username" in req.body) {
 						User.userExists(req.body.username, function (err, found) {
 							if (err) error.push("dberror");
@@ -48,7 +48,7 @@ router.route('/signup')
 						});
 					} else error.push("username");
 				},
-				callback=> {
+				callback => {
 					if ("email" in req.body) {
 						User.userExists(req.body.email, function (err, found) {
 							if (err) error.push("dberror");
@@ -59,17 +59,17 @@ router.route('/signup')
 						});
 					} else error.push("email");
 				},
-				callback=> {
+				callback => {
 					if ("password" in req.body) {
 						if (req.body.password.length < 6) error.push("passwords");
 						if (req.body.password.length > 1000) error.push("passwordl");
 					} else error.push("password");
 					callback(null, null);
 				}
-			], ()=> {
-				var doError = ()=> {
-					var errObject = Object.filter(errorMappings, error, false);
-					Object.keys(errObject).forEach((index)=> {
+			], () => {
+				let doError = () => {
+					let errObject = Object.filter(errorMappings, error, false);
+					Object.keys(errObject).forEach((index) => {
 						switch (index.slice(0, -1)) {
 							case "password":
 								errObject.password = errObject[index];
@@ -92,16 +92,16 @@ router.route('/signup')
 						redirect(req, res, "/signup");
 					}
 				};
-				var doErrors = true;
+				let doErrors = true;
 				if (error.length === 0) {
-					try{
-						var user = new User({
+					try {
+						let user = new User({
 							username: req.body.username.toString(),
 							password: req.body.password.toString(),
 							email: req.body.email.toString()
 						});
-					}catch(e){
-						cb(new TypeError("Expected a variable that could be turned into a string"));
+					} catch (e) {
+						cb(new TypeError("Expected a letiable that could be turned into a string"));
 					}
 					doErrors = false;
 					user.save(function (err) {
@@ -124,7 +124,7 @@ router.route('/signup')
 		} else next();
 	});
 router.route('/login')
-	.get((req, res, next)=> {
+	.get((req, res, next) => {
 		if ("user" in req.session) redirect(req, res, "/settings"); else next();
 	})
 	.post((req, res, next) => {
@@ -133,16 +133,16 @@ router.route('/login')
 			return;
 		}
 		if ("username" in req.body || "email" in req.body || "password" in req.body) {
-			var errorMappings = {
+			let errorMappings = {
 				"password": "Please enter a password",
 				"username": "Please enter a username or email address",
 				"dberror": "Uh-Oh, we're having an issue with our system. Please try again later",
 				"block": "Due to many login attempts, your account has been blocked. You may reset it by resetting your password",
 				"notfound": "Your username or password is incorrect"
 			};
-			var error = [];
+			let error = [];
 			async.parallel([
-				callback=> {
+				callback => {
 					if ("username" in req.body) {
 						User.userExists(req.body.username, function (err, found) {
 							if (err) error.push("dberror");
@@ -151,14 +151,14 @@ router.route('/login')
 						});
 					} else error.push("username");
 				},
-				callback=> {
+				callback => {
 					if (!("password" in req.body)) error.push("password");
 					callback(null, null);
 				}
-			], ()=> {
-				var doError = ()=> {
-					var errObject = Object.filter(errorMappings, error, false);
-					Object.keys(errObject).forEach((index)=> {
+			], () => {
+				let doError = () => {
+					let errObject = Object.filter(errorMappings, error, false);
+					Object.keys(errObject).forEach((index) => {
 						switch (index.slice(0, -1)) {
 							case "password":
 								errObject.password = errObject[index];
@@ -177,11 +177,11 @@ router.route('/login')
 						redirect(req, res, "/signup");
 					}
 				};
-				var doErrors = true;
+				let doErrors = true;
 				if (error.length === 0) {
 					doErrors = false;
-					var reasons = User.failedLogin;
-					User.getAuthenticated(req.body.username, req.body.password, (err, user, reason)=> {
+					let reasons = User.failedLogin;
+					User.getAuthenticated(req.body.username, req.body.password, (err, user, reason) => {
 						if (!err) {
 							if (user) {
 								req.session.user = user;
@@ -216,17 +216,17 @@ router.route('/login')
 		} else next();
 	});
 router.route(['/settings', '/settings/:panel'])
-	.get((req, res, next)=> {
+	.get((req, res, next) => {
 		if ("user" in req.session) {
-			var query = req.params.panel || req.query.panel || "General";
-			var panels = [
+			let query = req.params.panel || req.query.panel || "General";
+			let panels = [
 				{
 					name: "General",
 					content: getTemplate('content/settings/General.handlebars')(),
 					selected: false
 				}
 			];
-			if(req.session.user.perm.indexOf('Upload Spreadsheets') !== -1){
+			if (req.session.user.perm.indexOf('Upload Spreadsheets') !== -1) {
 				panels.push(
 					{
 						name: "Data",
@@ -234,7 +234,7 @@ router.route(['/settings', '/settings/:panel'])
 						selected: false
 					})
 			}
-			var match = false;
+			let match = false;
 			panels.forEach(obj => {
 				if (query.toUpperCase() === obj.name.toUpperCase()) obj.selected = true,
 					match = true;

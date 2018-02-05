@@ -33,7 +33,7 @@ this.addEventListener('fetch', function (event) {
 						return cache.match(event.request).then(function (response) {
 							console.log(response);
 							if (response == undefined) {
-								var r = new Response(new Blob(),{"status":567,"statusText":"Serviceworker"});
+								var r = new Response(new Blob(), {"status": 567, "statusText": "Serviceworker"});
 								console.log(r);
 								return r;
 							}

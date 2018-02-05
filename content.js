@@ -17,6 +17,7 @@ module.exports = (req, res, next) => {
 			callback(get(path.normalize(reqURI + "/index"), req, res) ? true : null);
 		}
 	], err => err || next());
+
 	function get(reqURI, req, res) {
 		if (Object.keys(pages).indexOf(reqURI) !== -1) {
 			pages[reqURI](req, con => {

@@ -2,10 +2,8 @@ services:
   - mongodb
 language: node_js
 node_js:
-  - "7"
-  - "6"
-  - "5"
-  - "4"
+  - "9"
+  - "8"
 env:
   - CXX=g++-4.8
 addons:

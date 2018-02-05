@@ -1,10 +1,10 @@
-var mongoose = require('mongoose'),
+let mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	scrypt = require('scrypt'),
 	MAX_LOGIN_ATTEMPTS = 100,
 	LOCK_TIME = 10 * 60 * 1000;
 
-var UserSchema = new Schema({
+let UserSchema = new Schema({
 	username: {type: String, required: true, index: true, unique: true},
 	password: {type: String, required: true},
 	perm: [],
@@ -20,12 +20,12 @@ UserSchema.virtual('isLocked').get(function () {
 });
 
 UserSchema.pre('save', function (next) {
-	var user = this;
+	let user = this;
 
 	// only hash the password if it has been modified (or is new)
 	if (!user.isModified('password')) return next();
 
-	scrypt.kdf(Buffer.from(user.password), {N: 68, r: 8, p: 1}, (err, hash)=> {
+	scrypt.kdf(Buffer.from(user.password), {N: 68, r: 8, p: 1}, (err, hash) => {
 		if (err) return next(err);
 		user.password = hash.toString('base64');
 		next();
@@ -47,7 +47,7 @@ UserSchema.methods.incLoginAttempts = function (cb) {
 			$unset: {lockUntil: 1}
 		}, cb);
 	}
-	var updates = {$inc: {loginAttempts: 1}};
+	let updates = {$inc: {loginAttempts: 1}};
 	// lock the account if we've reached max attempts and it's not locked already
 	if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
 		updates.$set = {lockUntil: Date.now() + LOCK_TIME};
@@ -55,17 +55,17 @@ UserSchema.methods.incLoginAttempts = function (cb) {
 	return this.update(updates, cb);
 };
 
-var reasons = UserSchema.statics.failedLogin = {
+let reasons = UserSchema.statics.failedLogin = {
 	NOT_FOUND: 0,
 	PASSWORD_INCORRECT: 1,
 	MAX_ATTEMPTS: 2
 };
 
 UserSchema.statics.getAuthenticated = function (username, password, cb) {
-	try{
+	try {
 		username = username.toString();
-	}catch(e){
-		cb(new TypeError("Expected a variable that could be turned into a string"));
+	} catch (e) {
+		cb(new TypeError("Expected a letiable that could be turned into a string"));
 	}
 	this.findOne({$or: [{username: username}, {email: username}]}, function (err, user) {
 		if (err) return cb(err);
@@ -93,7 +93,7 @@ UserSchema.statics.getAuthenticated = function (username, password, cb) {
 				// if there's no lock or failed attempts, just return the user
 				if (!user.loginAttempts && !user.lockUntil) return cb(null, user);
 				// reset attempts and lock info
-				var updates = {
+				let updates = {
 					$set: {loginAttempts: 0},
 					$unset: {lockUntil: 1}
 				};

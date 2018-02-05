@@ -5,7 +5,7 @@ Handlebars.registerHelper("concat", function (context, options) { //From https:/
 	if (!context) {
 		return "";
 	}
-	var sep = options.hash.sep || '',
+	let sep = options.hash.sep || '',
 		conj = options.hash.conj || '',
 		len = context.length,
 		out = "";
@@ -18,7 +18,7 @@ Handlebars.registerHelper("concat", function (context, options) { //From https:/
 	if (len === 3) {
 		return context[0] + sep + " " + context[1] + conj + context[2];
 	}
-	for (var i = 0; i < len; i++) {
+	for (let i = 0; i < len; i++) {
 		if (i === len - 1) {
 			out += sep + conj;
 		} else if (i > 0) {
@@ -39,11 +39,11 @@ Object.filter = function (obj, ignore, invert) {
 		return obj;
 	}
 	invert = invert || false;
-	var not = function (condition, yes) {
+	let not = function (condition, yes) {
 		return yes ? !condition : condition;
 	};
-	var isArray = Handlebars.Utils.isArray(ignore);
-	for (var key in obj) {
+	let isArray = Handlebars.Utils.isArray(ignore);
+	for (let key in obj) {
 		if (obj.hasOwnProperty(key) &&
 			(isArray && not(ignore.indexOf(key) === -1, invert)) ||
 			(!isArray && not(!ignore.call(undefined, key, obj[key]), invert))) {
@@ -54,26 +54,26 @@ Object.filter = function (obj, ignore, invert) {
 };
 
 
-var compiledTemplates = {};
-var getTemplate = exports.getTemplate = path=> {
+let compiledTemplates = {};
+let getTemplate = exports.getTemplate = path => {
 	if (Object.keys(compiledTemplates).indexOf(path) !== -1) {
 		return compiledTemplates[path];
 	} else {
-		var contents = fs.readFileSync(path);
+		let contents = fs.readFileSync(path);
 		fs.watch(path, event => {
 			if (event === "change") {
-				var contents = fs.readFileSync(path);
+				let contents = fs.readFileSync(path);
 				compiledTemplates[path] = Handlebars.compile(contents.toString('utf-8'));
 			}
 		});
-		var template = Handlebars.compile(contents.toString('utf-8'));
+		let template = Handlebars.compile(contents.toString('utf-8'));
 		compiledTemplates[path] = template;
 		return template;
 	}
 };
 
 
-var errCodes = {
+let errCodes = {
 	200: ['404 Not Found', 'Uh oh! Your page was not found.'],
 	403: ['403 Forbidden', 'For some reason, you are forbidden to view this content.'],
 	404: ['404 Not Found', 'Uh oh! Your page was not found.'],
@@ -84,7 +84,7 @@ var errCodes = {
 	504: ['504 Gateway Timeout', 'The upstream server failed to send a request in the time allowed by the server.'],
 	0: ['Unknown Error', 'An unknown error occurred.']
 };
-var doError = exports.doError = (error, req, res) => {
+let doError = exports.doError = (error, req, res) => {
 	res
 		.status(error)
 		.set({'content-type': 'text/html; charset=UTF-8'})
@@ -95,11 +95,11 @@ var doError = exports.doError = (error, req, res) => {
 };
 
 
-var formatPage = exports.formatPage = (req, reqURI, title, content) => {
+let formatPage = exports.formatPage = (req, reqURI, title, content) => {
 	if (!req.content) {
-		var loggedIn = "user" in req.session;
-		var headerTemplate = getTemplate("content/page.handlebars");
-		var menu = {
+		let loggedIn = "user" in req.session;
+		let headerTemplate = getTemplate("content/page.handlebars");
+		let menu = {
 			'/': ['Home', []],
 			'/data': ['View Draws', []],
 			'/contact': ['Contact', []],
@@ -115,9 +115,15 @@ var formatPage = exports.formatPage = (req, reqURI, title, content) => {
 		if (Object.keys(menu).indexOf(reqURI) !== -1) {
 			menu[reqURI][1].push('active');
 		}
-		var originalYear = 2015;
-		var templateParameters = {title: title, menu: menu, content: content, serviceWorker: req.secure, originalYear: originalYear};
-		if(new Date().getFullYear() !== originalYear){
+		let originalYear = 2015;
+		let templateParameters = {
+			title: title,
+			menu: menu,
+			content: content,
+			serviceWorker: req.secure,
+			originalYear: originalYear
+		};
+		if (new Date().getFullYear() !== originalYear) {
 			templateParameters.showSecondYear = true;
 			templateParameters.year = new Date().getFullYear();
 		}
@@ -134,29 +140,29 @@ exports.redirect = (req, res, dest) => {
 };
 
 exports.methodNA = router => {
-	var routes = [];
-	router.stack.forEach(obj=> {
-		var methodsObj = obj.route ? obj.route.methods : {};
-		var methods = [];
-		Object.keys(methodsObj).forEach(key=> {
-			var value = methodsObj[key];
+	let routes = [];
+	router.stack.forEach(obj => {
+		let methodsObj = obj.route ? obj.route.methods : {};
+		let methods = [];
+		Object.keys(methodsObj).forEach(key => {
+			let value = methodsObj[key];
 			if (value) methods.push(key);
 		});
 		routes.push({regexp: obj.regexp, methods: methods});
 	});
-	router.use((req, res, next)=> {
+	router.use((req, res, next) => {
 		try {
-			var match = false;
-			routes.forEach(obj=> {
+			let match = false;
+			routes.forEach(obj => {
 				if (obj.regexp.test(req._parsedUrl.pathname)) {
 					match = true;
-					var methodMatch = false;
+					let methodMatch = false;
 					if (obj.methods.indexOf("_all") !== -1
 						|| obj.methods.indexOf(req.method.toLowerCase()) !== -1)
 						throw next();
 				}
 			});
-			if(!match) return next();
+			if (!match) return next();
 		} catch (e) {
 			return;
 		}
