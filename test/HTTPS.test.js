@@ -46,7 +46,7 @@ describe('Server', function () {
 					});
 			});
 			it('should exist', function (done) {
-				fs.access("../index.js", fs.constants.R_OK, function (err) {
+				fs.access("index.js", fs.constants.R_OK, function (err) {
 					done(err);
 				});
 			});
@@ -91,7 +91,7 @@ describe('Server', function () {
 					'/login': ['Login', ['right']],
 					'/signup': ['Sign Up', ['right']]
 				};
-				let template = Handlebars.compile(fs.readFileSync('../content/page.handlebars').toString());
+				let template = Handlebars.compile(fs.readFileSync('content/page.handlebars').toString());
 				it('should show the home page correctly', function (done) {
 					request({
 						url: 'https://localhost:' + port,
@@ -99,7 +99,7 @@ describe('Server', function () {
 					}, function (err, res, resBody) {
 						expect(err).to.not.exist;
 						expect(res.statusCode).to.be.at.most(399);
-						fs.readFile('../content/index.handlebars', function (err, index) {
+						fs.readFile('content/index.handlebars', function (err, index) {
 							expect(err).to.not.be.an('error');
 							let originalYear = 2015;
 							let templateParameters = {
