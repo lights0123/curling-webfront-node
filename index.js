@@ -1,210 +1,135 @@
-var serve = (function (options) {
-	const fs = require('fs');
-	const express = require('express');
-	const app = express();
-	var http;
-	var travisHandler;
-	const path = require('path');
-	const compression = require('compression');
-	const session = require('express-session');
-	const MongoStore = require('connect-mongo')(session);
-	const mongoose = require('mongoose');
-	const async = require('async');
-	const Handlebars = require('handlebars');
-	const bodyParser = require('body-parser');
-	const nconf = require('nconf');
-	const helpers = require('./helpers');
-	const getTemplate = helpers.getTemplate;
-	const doError = helpers.doError;
-	const createTravisHandler = require('./travis-webhook');
-	const childProcess = require('child_process');
-	var isFunction = Handlebars.Utils.isFunction;
-	nconf.argv()
-		.env()
-		.file({file: 'config.json'})
-		.overrides(options)
-		.defaults({
-			database: {
-				host: 'localhost',
-				database: 'curlcsc',
-				port: 27017
-			},
-			ssl: false,
-			port: 2000,
-			deploy: {
-				"travis-token": null, //Current:  -----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvtjdLkS+FP+0fPC09j25\ny/PiuYDDivIT86COVedvlElk99BBYTrqNaJybxjXbIZ1Q6xFNhOY+iTcBr4E1zJu\ntizF3Xi0V9tOuP/M8Wn4Y/1lCWbQKlWrNQuqNBmhovF4K3mDCYswVbpgTmp+JQYu\nBm9QMdieZMNry5s6aiMA9aSjDlNyedvSENYo18F+NYg1J0C0JiPYTxheCb4optr1\n5xNzFKhAkuGs4XTOA5C7Q06GCKtDNf44s/CVE30KODUxBi0MCKaxiXw/yy55zxX2\n/YdGphIyQiA5iO1986ZmZCLLW8udz9uhW5jUr3Jlp9LbmphAC61bVSf4ou2YsJaN\n0QIDAQAB\n-----END PUBLIC KEY-----
-				script: ""
-			},
-			cookie_secret: "CHANGE THIS"
-		});
-
-	if (nconf.get('ssl')) {
-		var SSLSettings = nconf.get('ssl');
-		var newSSLSettings = {};
-		if (SSLSettings.key) newSSLSettings.key = fs.readFileSync(SSLSettings.key);
-		if (SSLSettings.cert) newSSLSettings.cert = fs.readFileSync(SSLSettings.cert);
-		if (SSLSettings.pfx) newSSLSettings.pfx = fs.readFileSync(SSLSettings.pfx);
-		http = require('https').createServer(Object.assign(SSLSettings, newSSLSettings), app);
-	} else {
-		http = require('http').createServer(app);
-	}
-
-
-	app.set('trust proxy', 'loopback');
-	app.use((req, res, next)=> {
-		req.path = path.normalize(req.path);
-		next();
+const {readFileSync} = require('fs');
+const express = require('express');
+const app = express();
+const {normalize: normalizePath} = require('path');
+const compression = require('compression');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const nconf = require('nconf');
+const {doError} = require('./helpers');
+const createTravisHandler = require('./travis-webhook');
+const {exec} = require('child_process');
+let http;
+let travisHandler;
+let isProduction = process.env.NODE_ENV === "production";
+nconf.argv()
+	.env()
+	.file({file: 'config.json'})
+	.defaults({
+		database: {
+			host: 'localhost',
+			database: 'curlcsc',
+			port: 27017
+		},
+		ssl: false,
+		port: 2000,
+		deploy: {
+			"travis-token": null, //Current:  -----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvtjdLkS+FP+0fPC09j25\ny/PiuYDDivIT86COVedvlElk99BBYTrqNaJybxjXbIZ1Q6xFNhOY+iTcBr4E1zJu\ntizF3Xi0V9tOuP/M8Wn4Y/1lCWbQKlWrNQuqNBmhovF4K3mDCYswVbpgTmp+JQYu\nBm9QMdieZMNry5s6aiMA9aSjDlNyedvSENYo18F+NYg1J0C0JiPYTxheCb4optr1\n5xNzFKhAkuGs4XTOA5C7Q06GCKtDNf44s/CVE30KODUxBi0MCKaxiXw/yy55zxX2\n/YdGphIyQiA5iO1986ZmZCLLW8udz9uhW5jUr3Jlp9LbmphAC61bVSf4ou2YsJaN\n0QIDAQAB\n-----END PUBLIC KEY-----
+			script: ""
+		},
+		cookie_secret: "CHANGE THIS"
 	});
-	app.all("/content/*", (req, res, next)=> {
-		req.content = true;
-		req.url = path.normalize(req.params[0] === "" ? "/" : req.params[0]);
-		next();
-	});
-	app.use(bodyParser.json());
-	app.use(bodyParser.urlencoded({extended: true}));
-	function connectMongoose(cb) {
-		mongoose.connect('mongodb://' + nconf.get('database:host') + ':' + nconf.get('database:port') + '/' + nconf.get('database:database'), {
-			user: nconf.get('database:user'),
-			pass: nconf.get('database:password')
-		}, (err)=> {
-			if (err) {
-				console.error("Fatal Exception: Could not establish connection to MongoDB");
-				console.error(err);
-				cb(err);
-			} else isFunction(cb) && cb(err);
-		});
-	}
-
-	function connectMongoStore() {
-		sessionHandler = session({
-			store: new MongoStore({mongooseConnection: mongoose.connection}),
-			secret: nconf.get('cookie_secret'),
-			cookie: {secure: 'auto'},
-			resave: false,
-			saveUninitialized: false
-		});
-	}
-
-	app.use((req, res, next)=>sessionHandler(req, res, next));
-	app.use(compression());
-
-	if (nconf.get('deploy:travis-token') !== null) {
-		if (nconf.get('deploy:travis-token') === "") {
-			travisHandler = createTravisHandler();
-			app.use('/deploy', travisHandler);
-		} else {
-			travisHandler = createTravisHandler(nconf.get('deploy:travis-token'));
-			app.use('/deploy', travisHandler);
-		}
-		travisHandler.on('success', data=> {
-			if (data.type === 'push' && data.branch === 'master') {
-				childProcess.exec(nconf.get('deploy:script'))
-			}
-		});
-	}
-
-	app.use(require('./routes/users'));
-	app.use(require('./routes/spreadsheet'));
-	app.use(require('./content'));
-	app.use((req, res, next) => {
-		var reqURI = req.path;
-		var checkPath = path.normalize("public/" + reqURI);
-		checkRaw(checkPath, result=> {
-			if (result !== null) {
-				if (result.isDir) {
-					//TODO: add directory viewer
-				} else if (!req.content) return res.sendFile(path.resolve(result.path));
-				else if (req.content) return res.end(req.path);
-			}
-			next();
-		});
-	});
-
-	function startServer() {
-		http.listen(nconf.get('port'), () => {
-			console.log('listening on *:' + nconf.get('port'));
-		});
-	}
-
-	function checkRaw(checkPath, callback) {
-		async.parallel([
-			callback=>fs.stat(checkPath, (err, stats)=> {
-				if (!err) {
-					if (stats.isDirectory()) {
-						fs.stat(checkPath + "/index.html", (err, stats)=> {
-							if (!err && !stats.isDirectory()) callback(null, {
-								path: path.normalize(checkPath + "/index.html"),
-								isDir: false
-							}); else callback(null, {path: path.normalize(checkPath), isDir: true});
-						});
-					} else callback(null, {path: path.normalize(checkPath), isDir: false});
-				} else callback(null, null);
-			}),
-			callback=>fs.stat(checkPath + ".html", (err, stats)=> {
-				if (!err && !stats.isDirectory()) {
-					callback(null, {path: path.normalize(checkPath + ".html"), isDir: false})
-				} else callback(null, null);
-			})], (err, results)=> {
-			var bestMatch = null;
-			results.forEach(item=> {
-				if (item !== null) {
-					if (bestMatch === null) bestMatch = item;
-					else if (item.isDir === false && bestMatch.isDir === true) bestMatch = item;
-				}
-			});
-			!Handlebars.Utils.isFunction(callback) || callback(bestMatch);
-		});
-	}
-
-	app.use((req, res) => {
-		doError(404, req, res);
-	});
-	app.use((err, req, res, next) => {
-		console.error(err);
-		doError(500, req, res);
-	});
-
-	exports.connectMongoose = connectMongoose;
-	exports.connectMongoStore = connectMongoStore;
-	exports.startServer = startServer;
-	exports.stop = () => {
-		http.close();
-		mongoose.disconnect()
-	};
-	if (require.main === module) {
-		try {
-			connectMongoose(err=> {
-				if (err) process.exit(1);
-			});
-			connectMongoStore();
-			startServer();
-		} catch (e) {
-			process.exit(1);
-		}
-	}
-	if (process.platform === "win32") {
-		var rl = require("readline").createInterface({
-			input: process.stdin,
-			output: process.stdout
-		});
-
-		rl.on("SIGINT", function () {
-			process.emit("SIGINT");
-		});
-	}
-
-	process.on("SIGINT", function () {
-		exports.stop();
-		console.log('stopping');
-		process.exit();
-	});
-});
-if (require.main === module) {
-	serve();
-	if(process.send) process.send('online');
-}else{
-	exports.init = function(options){
-		serve(options);
-		return this;
-	};
+if (nconf.get('cookie_secret') === "CHANGE THIS") {
+	if (isProduction) {
+		console.error(`Default cookie_secret value! Change the variable "cookie_secret"!`);
+		process.exit(1);
+	} else console.warn(`Default cookie_secret value!`);
 }
+if (nconf.get('ssl')) {
+	//TODO: http2
+	let SSLSettings = nconf.get('ssl');
+	let newSSLSettings = {};
+	if (SSLSettings.key) newSSLSettings.key = readFileSync(SSLSettings.key);
+	if (SSLSettings.cert) newSSLSettings.cert = readFileSync(SSLSettings.cert);
+	if (SSLSettings.pfx) newSSLSettings.pfx = readFileSync(SSLSettings.pfx);
+	http = require('https').createServer(Object.assign(SSLSettings, newSSLSettings), app);
+} else {
+	http = require('http').createServer(app);
+}
+
+
+app.set('trust proxy', 'loopback');
+app.use((req, res, next) => {
+	req.path = normalizePath(req.path);
+	next();
+});
+//TODO: remove once HTTP2 is implemented
+app.all("/content/*", (req, res, next) => {
+	req.content = true;
+	req.url = normalizePath(req.params[0] === "" ? "/" : req.params[0]);
+	next();
+});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+mongoose.connect('mongodb://' + nconf.get('database:host') + ':' + nconf.get('database:port') + '/' + nconf.get('database:database'), {
+	user: nconf.get('database:user'),
+	pass: nconf.get('database:password')
+}, (err) => {
+	if (err) {
+		console.error("Could not establish connection to MongoDB");
+		console.error(err);
+	}
+});
+let sessionHandler = session({
+	store: new MongoStore({mongooseConnection: mongoose.connection}),
+	secret: nconf.get('cookie_secret'),
+	cookie: {secure: 'auto'},
+	resave: false,
+	saveUninitialized: false
+});
+
+app.use((req, res, next) => sessionHandler(req, res, next));
+app.use(compression());
+
+if (nconf.get('deploy:travis-token') !== null) {
+	//TODO: switch to something better
+	if (nconf.get('deploy:travis-token') === "") {
+		travisHandler = createTravisHandler();
+		app.use('/deploy', travisHandler);
+	} else {
+		travisHandler = createTravisHandler(nconf.get('deploy:travis-token'));
+		app.use('/deploy', travisHandler);
+	}
+	travisHandler.on('success', data => {
+		if (data.type === 'push' && data.branch === 'master') {
+			exec(nconf.get('deploy:script'))
+		}
+	});
+}
+
+app.use(require('./routes/users'));
+app.use(require('./routes/spreadsheet'));
+app.use(require('./content'));
+app.use(express.static('public', {'index': ['index.html']}));
+
+http.listen(nconf.get('port'), () => {
+	console.log('listening on *:' + nconf.get('port'));
+	if (process.send) process.send('online');
+});
+
+app.use((req, res) => {
+	doError(404, req, res);
+});
+app.use((err, req, res) => {
+	console.error(err);
+	doError(500, req, res);
+});
+if (process.platform === "win32") {
+	let rl = require("readline").createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+
+	rl.on("SIGINT", function () {
+		process.emit("SIGINT");
+	});
+}
+
+process.on("SIGINT", function () {
+	console.log('stopping');
+	http.close();
+	mongoose.disconnect();
+	process.exit();
+});

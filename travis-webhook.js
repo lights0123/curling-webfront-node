@@ -1,8 +1,8 @@
 /* Note: this mostly comes from https://github.com/chrisjaure/travisci-webhook-handler
  * modified to support express */
-var EventEmitter = require('events').EventEmitter;
-var NodeRSA = require('node-rsa');
-var statusMessages = {
+let EventEmitter = require('events').EventEmitter;
+let NodeRSA = require('node-rsa');
+let statusMessages = {
 	success: [
 		'Passed',
 		'Fixed'
@@ -18,7 +18,7 @@ var statusMessages = {
 };
 
 function bindEmitter(obj, emitter) {
-	var methods = 'addListener,on,once,removeListener,removeAllListeners,setMaxListeners,listeners,emit';
+	let methods = 'addListener,on,once,removeListener,removeAllListeners,setMaxListeners,listeners,emit';
 	methods.split(',').forEach(function (fn) {
 		obj[fn] = emitter[fn].bind(emitter);
 	});
@@ -26,12 +26,12 @@ function bindEmitter(obj, emitter) {
 
 function create(publicKey) {
 
-	var handler = function (req, res, next) {
+	let handler = function (req, res, next) {
 		console.log(req.body.payload);
 		console.log(req.headers);
-		var repoSlug = req.headers['travis-repo-slug'];
+		let repoSlug = req.headers['travis-repo-slug'];
 
-		var sig = req.headers['signature'];
+		let sig = req.headers['signature'];
 		if (!sig) {
 			console.log('No Signature found on request');
 			return hasError('No Signature found on request');
@@ -43,24 +43,27 @@ function create(publicKey) {
 		console.log(publicKey);
 
 		function hasError(msg) {
-			var err = new Error(msg);
+			let err = new Error(msg);
 			next(err);
 		}
+
 		//if(publicKey) {
-			var key = new NodeRSA(publicKey, {signingScheme: 'sha1'});
-			if (!key.verify(JSON.parse(req.body.payload), sig, 'base64', 'base64'))
-				return console.log('Signed payload does not match signature'), hasError('Signed payload does not match signature');
+		let key = new NodeRSA(publicKey, {signingScheme: 'sha1'});
+		if (!key.verify(JSON.parse(req.body.payload), sig, 'base64', 'base64')) {
+			console.log('Signed payload does not match signature');
+			return hasError('Signed payload does not match signature');
+		}
 		//}
 
-		var result;
+		let result;
 		try {
 			result = JSON.parse(req.body.payload);
 		} catch (err) {
 			return hasError(err.message);
 		}
-		var status = null;
+		let status = null;
 		Object.keys(statusMessages).some(key => {
-			var value = statusMessages[key];
+			let value = statusMessages[key];
 			if (value.indexOf(result.status_message) !== -1) {
 				status = key;
 				return true;
