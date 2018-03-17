@@ -1,7 +1,8 @@
-const Handlebars = require('handlebars');
-const fs = require('fs');
-const {normalize, extname} = require('path');
-const mime = require("mime");
+import Handlebars from "handlebars";
+import fs from "fs";
+import {extname, normalize} from 'path';
+import mime from "mime";
+
 const isProduction = process.env.NODE_ENV === "production";
 
 Handlebars.registerHelper("concat", function (context, options) { //From https://github.com/duckduckgo/duckduckgo-template-helpers/blob/master/template_helpers.js#L68
@@ -58,7 +59,8 @@ Object.filter = function (obj, ignore, invert) {
 
 
 let compiledTemplates = {};
-let getTemplate = exports.getTemplate = path => {
+
+export function getTemplate(path) {
 	if (Object.keys(compiledTemplates).indexOf(path) !== -1) {
 		return compiledTemplates[path];
 	} else {
@@ -73,7 +75,7 @@ let getTemplate = exports.getTemplate = path => {
 		compiledTemplates[path] = template;
 		return template;
 	}
-};
+}
 
 
 let errCodes = {
@@ -87,7 +89,8 @@ let errCodes = {
 	504: ['504 Gateway Timeout', 'The upstream server failed to send a request in the time allowed by the server.'],
 	0: ['Unknown Error', 'An unknown error occurred.']
 };
-let doError = exports.doError = (error, req, res) => {
+
+export function doError(error, req, res) {
 	res
 		.status(error)
 		.set({'content-type': 'text/html; charset=UTF-8'})
@@ -95,10 +98,9 @@ let doError = exports.doError = (error, req, res) => {
 			code: errCodes[error][0],
 			message: errCodes[error][1]
 		})));
-};
+}
 
-
-let formatPage = exports.formatPage = (req, res, reqURI, title, content) => {
+export function formatPage(req, res, reqURI, title, content) {
 	if (!req.content) {
 		push(res, "/css/main.css");
 		push(res, "/js/menu.js");
@@ -138,15 +140,14 @@ let formatPage = exports.formatPage = (req, res, reqURI, title, content) => {
 	} else {
 		return title + "\n" + content;
 	}
-};
+}
 
-
-exports.redirect = (req, res, dest) => {
+export function redirect(req, res, dest) {
 	if (req.content) res.end(dest);
 	else res.redirect(dest);
-};
+}
 
-exports.methodNA = router => {
+export function methodNA(router) {
 	let routes = [];
 	router.stack.forEach(obj => {
 		let methodsObj = obj.route ? obj.route.methods : {};
@@ -175,9 +176,9 @@ exports.methodNA = router => {
 		}
 		doError(405, req, res);
 	});
-};
+}
 
-exports.push = push = (res, staticPath) => {
+export function push(res, staticPath) {
 	if (res.push) {
 		res.push(normalize("/" + staticPath), {
 			request: {'accept': '*/*'},
@@ -192,4 +193,4 @@ exports.push = push = (res, staticPath) => {
 			});
 		});
 	}
-};
+}

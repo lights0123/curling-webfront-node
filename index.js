@@ -51,16 +51,7 @@ if (nconf.get('ssl')) {
 
 
 app.set('trust proxy', 'loopback');
-app.use((req, res, next) => {
-	req.path = normalizePath(req.path);
-	next();
-});
-//TODO: remove once HTTP2 is implemented
-app.all("/content/*", (req, res, next) => {
-	req.content = true;
-	req.url = normalizePath(req.params[0] === "" ? "/" : req.params[0]);
-	next();
-});
+app.use(express.static('public', {'index': ['index.html']}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 mongoose.connect('mongodb://' + nconf.get('database:host') + ':' + nconf.get('database:port') + '/' + nconf.get('database:database'), {
@@ -102,7 +93,6 @@ if (nconf.get('deploy:travis-token') !== null) {
 app.use(require('./routes/users'));
 app.use(require('./routes/spreadsheet'));
 app.use(require('./content'));
-app.use(express.static('public', {'index': ['index.html']}));
 
 http.listen(nconf.get('port'), () => {
 	console.log('listening on *:' + nconf.get('port'));
