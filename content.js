@@ -2,10 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const Handlebars = require('handlebars');
 const async = require('async');
-const helpers = require('./helpers');
-const getTemplate = helpers.getTemplate;
-const doError = helpers.doError;
-const formatPage = helpers.formatPage;
+const {getTemplate, doError, formatPage} = require('./helpers');
 const dataStorage = require('./models/bonspielData');
 module.exports = (req, res, next) => {
 	var reqURI = req.path;
@@ -23,7 +20,7 @@ module.exports = (req, res, next) => {
 			pages[reqURI](req, con => {
 				if (!(con.format === false)) {
 					res.set({'content-type': 'text/html; charset=UTF-8'});
-					res.end(formatPage(req, reqURI, con.title, con.content));
+					res.end(formatPage(req, res, reqURI, con.title, con.content));
 				} else {
 					res.set({'content-type': 'text/html; charset=UTF-8'});
 					res.end(con.content);

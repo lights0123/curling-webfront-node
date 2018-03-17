@@ -115,14 +115,14 @@ router.route(['/data', '/data/:panel'])
 		dataStorage.getLatestYear((err, data) => {
 			res.set({'content-type': 'text/html; charset=UTF-8'});
 			if (!err && data) {
-				res.end(formatPage(req, req.path, "View Draws", getTemplate('content/data.handlebars')({
+				res.end(formatPage(req, res, req.path, "View Draws", getTemplate('content/data.handlebars')({
 					data: JSON.stringify(data[0].data),
 					selected: selected,
 					panels: panels,
 					selectedEvent: panels[selected]
 				})));
 			} else
-				res.end(formatPage(req, req.path, "View Draws", getTemplate('content/data.handlebars')({
+				res.end(formatPage(req, res, req.path, "View Draws", getTemplate('content/data.handlebars')({
 					selected: selected,
 					panels: panels,
 					selectedEvent: panels[selected]

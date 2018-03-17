@@ -11,9 +11,9 @@ const nconf = require('nconf');
 const {doError} = require('./helpers');
 const createTravisHandler = require('./travis-webhook');
 const {exec} = require('child_process');
+const isProduction = process.env.NODE_ENV === "production";
 let http;
 let travisHandler;
-let isProduction = process.env.NODE_ENV === "production";
 nconf.argv()
 	.env()
 	.file({file: 'config.json'})
@@ -44,7 +44,7 @@ if (nconf.get('ssl')) {
 	if (SSLSettings.key) newSSLSettings.key = readFileSync(SSLSettings.key);
 	if (SSLSettings.cert) newSSLSettings.cert = readFileSync(SSLSettings.cert);
 	if (SSLSettings.pfx) newSSLSettings.pfx = readFileSync(SSLSettings.pfx);
-	http = require('https').createServer(Object.assign(SSLSettings, newSSLSettings), app);
+	http = require('spdy').createServer(Object.assign(SSLSettings, newSSLSettings), app);
 } else {
 	http = require('http').createServer(app);
 }

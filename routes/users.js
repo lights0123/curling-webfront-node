@@ -2,12 +2,7 @@ let express = require('express');
 const async = require('async');
 const User = require('../models/user');
 const Handlebars = require('handlebars');
-const helpers = require('../helpers');
-const getTemplate = helpers.getTemplate;
-const doError = helpers.doError;
-const formatPage = helpers.formatPage;
-const redirect = helpers.redirect;
-const methodNA = helpers.methodNA;
+const {getTemplate, formatPage, redirect, methodNA} = require('../helpers');
 let router = express.Router();
 router.route('/signout')
 	.get((req, res, next) => {
@@ -241,7 +236,7 @@ router.route(['/settings', '/settings/:panel'])
 			});
 			if (!match) panels[0].selected = true;
 			res.set({'content-type': 'text/html; charset=UTF-8'});
-			res.end(formatPage(req, req.path, "Settings", getTemplate('content/settings.handlebars')({panels: panels})));
+			res.end(formatPage(req, res, req.path, "Settings", getTemplate('content/settings.handlebars')({panels: panels})));
 		} else redirect(req, res, "/login");
 	});
 

@@ -1,5 +1,8 @@
 const Handlebars = require('handlebars');
 const fs = require('fs');
+const {normalize, extname} = require('path');
+const mime = require("mime");
+const isProduction = process.env.NODE_ENV === "production";
 
 Handlebars.registerHelper("concat", function (context, options) { //From https://github.com/duckduckgo/duckduckgo-template-helpers/blob/master/template_helpers.js#L68
 	if (!context) {
@@ -95,8 +98,12 @@ let doError = exports.doError = (error, req, res) => {
 };
 
 
-let formatPage = exports.formatPage = (req, reqURI, title, content) => {
+let formatPage = exports.formatPage = (req, res, reqURI, title, content) => {
 	if (!req.content) {
+		push(res, "/css/main.css");
+		push(res, "/js/menu.js");
+		push(res, "/img/back.png");
+		push(res, "/fonts/PT_Sans-Web-Regular.woff");
 		let loggedIn = "user" in req.session;
 		let headerTemplate = getTemplate("content/page.handlebars");
 		let menu = {
@@ -120,7 +127,7 @@ let formatPage = exports.formatPage = (req, reqURI, title, content) => {
 			title: title,
 			menu: menu,
 			content: content,
-			serviceWorker: req.secure,
+			serviceWorker: /* req.secure */ false,
 			originalYear: originalYear
 		};
 		if (new Date().getFullYear() !== originalYear) {
@@ -168,4 +175,21 @@ exports.methodNA = router => {
 		}
 		doError(405, req, res);
 	});
+};
+
+exports.push = push = (res, staticPath) => {
+	if (res.push) {
+		res.push(normalize("/" + staticPath), {
+			request: {'accept': '*/*'},
+			response: {'content-type': mime.getType(extname(staticPath))}
+		}, (err, stream) => {
+			stream.on('error', err => {
+				if (!isProduction) console.log(err);
+			});
+			fs.readFile(normalize("public/" + staticPath), (err, data) => {
+				if (err) stream.end();
+				stream.end(data);
+			});
+		});
+	}
 };
