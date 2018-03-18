@@ -38,7 +38,6 @@ if (nconf.get('cookie_secret') === "CHANGE THIS") {
 	} else console.warn(`Default cookie_secret value!`);
 }
 if (nconf.get('ssl')) {
-	//TODO: http2
 	let SSLSettings = nconf.get('ssl');
 	let newSSLSettings = {};
 	if (SSLSettings.key) newSSLSettings.key = readFileSync(SSLSettings.key);

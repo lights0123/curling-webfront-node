@@ -22,24 +22,24 @@
 </head>
 <body>
 <div id="container">
-	<div id="menu">
+	<nav>
 		<ul>
 			{{#each menu}}
 				<li{{#if this.[1]}} class="{{concat this.[1] conj=" "}}"{{/if}}><a
 						href="{{@key}}"><span>{{this.[0]}}</span></a></li>
 			{{/each}}
 		</ul>
-	</div>
+	</nav>
 	<div id="content">
 		{{#if content}}
 			{{{content}}}
 		{{/if}}
 	</div>
-	<div id="footer">
+	<footer>
 		<p>Copyright © {{#if originalYear}}{{originalYear}}{{else}}2015{{/if}}{{#if showSecondYear}}-{{year}}{{/if}} Ben Schattinger. Some rights reserved by the <a
 				href="/license">license</a>.</p>
 		<p><a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a></p>
-	</div>
+	</footer>
 </div>
 </body>
 </html>
