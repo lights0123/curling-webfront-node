@@ -2,3 +2,4 @@ node_modules
 cert.crt
 key.key
 main.bundle.js
+dist/
