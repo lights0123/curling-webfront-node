@@ -103,7 +103,6 @@ export function doError(error, req, res) {
 export function formatPage(req, res, reqURI, title, content) {
 	if (!req.content) {
 		push(res, "/css/main.css");
-		push(res, "/js/menu.js");
 		push(res, "/img/back.png");
 		push(res, "/fonts/PT_Sans-Web-Regular.woff");
 		let loggedIn = "user" in req.session;
@@ -178,6 +177,12 @@ export function methodNA(router) {
 	});
 }
 
+/**
+ * Sends a file using HTTP2 push
+ *
+ * @param res			The res object passed by Express
+ * @param staticPath	The file to send
+ */
 export function push(res, staticPath) {
 	if (res.push) {
 		res.push(normalize("/" + staticPath), {
@@ -187,9 +192,13 @@ export function push(res, staticPath) {
 			stream.on('error', err => {
 				if (!isProduction) console.log(err);
 			});
-			fs.readFile(normalize("public/" + staticPath), (err, data) => {
-				if (err) stream.end();
-				stream.end(data);
+			fs.readFile(normalize("dist/" + staticPath), (err, data) => {
+				if (err) {
+					fs.readFile(normalize("public/" + staticPath), (err, data) => {
+						if (err) stream.end();
+						else stream.end(data);
+					});
+				} else stream.end(data);
 			});
 		});
 	}

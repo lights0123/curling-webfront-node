@@ -50,6 +50,7 @@ if (nconf.get('ssl')) {
 
 
 app.set('trust proxy', 'loopback');
+app.use(express.static('dist', {'index': ['index.html']}));
 app.use(express.static('public', {'index': ['index.html']}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
