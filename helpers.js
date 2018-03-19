@@ -61,20 +61,13 @@ Object.filter = function (obj, ignore, invert) {
 let compiledTemplates = {};
 
 export function getTemplate(path) {
-	if (Object.keys(compiledTemplates).indexOf(path) !== -1) {
+	if (isProduction && Object.keys(compiledTemplates).indexOf(path) !== -1) {
 		return compiledTemplates[path];
-	} else {
-		let contents = fs.readFileSync(path);
-		fs.watch(path, event => {
-			if (event === "change") {
-				let contents = fs.readFileSync(path);
-				compiledTemplates[path] = Handlebars.compile(contents.toString('utf-8'));
-			}
-		});
-		let template = Handlebars.compile(contents.toString('utf-8'));
-		compiledTemplates[path] = template;
-		return template;
 	}
+	let contents = fs.readFileSync(path);
+	let template = Handlebars.compile(contents.toString('utf-8'));
+	if (isProduction) compiledTemplates[path] = template;
+	return template;
 }
 
 
@@ -102,31 +95,37 @@ export function doError(error, req, res) {
 
 export function formatPage(req, res, reqURI, title, content) {
 	if (!req.content) {
-		push(res, "/css/main.css");
-		push(res, "/img/back.png");
-		push(res, "/fonts/PT_Sans-Web-Regular.woff");
+		//push(res, "/css/main.css");
+		push(res, "/main.bundle.js");
+		//push(res, "/fonts/PT_Sans-Web-Regular.woff");
 		let loggedIn = "user" in req.session;
 		let headerTemplate = getTemplate("content/page.handlebars");
-		let menu = {
-			'/': ['Home', []],
-			'/data': ['View Draws', []],
-			'/contact': ['Contact', []],
-			'/about': ['About', []]
+		let rightMenu = {};
+		let leftMenu = {
+			'/': {name: 'Home'},
+			'/data': {name: 'View Draws'},
+			'/contact': {name: 'Contact'},
+			'/about': {name: 'About'}
 		};
 		if (loggedIn) {
-			menu['/signout'] = ['Sign Out', ['right']];
-			menu['/settings'] = ['Settings', ['right']];
+			rightMenu['/signout'] = {name: 'Sign Out'};
+			rightMenu['/settings'] = {name: 'Settings'};
 		} else {
-			menu['/login'] = ['Login', ['right']];
-			menu['/signup'] = ['Sign Up', ['right']];
+			rightMenu['/login'] = {name: 'Login'};
+			rightMenu['/signup'] = {name: 'Sign Up'};
 		}
-		if (Object.keys(menu).indexOf(reqURI) !== -1) {
-			menu[reqURI][1].push('active');
+		if (reqURI in leftMenu) {
+			if (!leftMenu[reqURI].class) leftMenu[reqURI].class = [];
+			leftMenu[reqURI].class.push('active');
+		} else if (reqURI in rightMenu) {
+			if (!rightMenu[reqURI].class) rightMenu[reqURI].class = [];
+			rightMenu[reqURI].class.push('active');
 		}
 		let originalYear = 2015;
 		let templateParameters = {
 			title: title,
-			menu: menu,
+			leftMenu: leftMenu,
+			rightMenu: rightMenu,
 			content: content,
 			serviceWorker: /* req.secure */ false,
 			originalYear: originalYear
@@ -180,8 +179,8 @@ export function methodNA(router) {
 /**
  * Sends a file using HTTP2 push
  *
- * @param res			The res object passed by Express
- * @param staticPath	The file to send
+ * @param res            The res object passed by Express
+ * @param staticPath    The file to send
  */
 export function push(res, staticPath) {
 	if (res.push) {

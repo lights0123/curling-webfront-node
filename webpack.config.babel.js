@@ -90,7 +90,7 @@ const config = [
 							options: {
 								limit: 8192,
 								outputPath: "img",
-								publicPath: '/',
+								publicPath: '/img/',
 								useRelativePath: false
 							}
 						}
@@ -104,7 +104,7 @@ const config = [
 							options: {
 								limit: 8192,
 								outputPath: "fonts",
-								publicPath: '/',
+								publicPath: '/fonts/',
 								useRelativePath: false
 							}
 						}

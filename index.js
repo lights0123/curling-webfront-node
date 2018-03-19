@@ -52,8 +52,8 @@ if (nconf.get('ssl')) {
 app.set('trust proxy', 'loopback');
 app.use(express.static('dist', {'index': ['index.html']}));
 app.use(express.static('public', {'index': ['index.html']}));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({extended: true}));
 mongoose.connect('mongodb://' + nconf.get('database:host') + ':' + nconf.get('database:port') + '/' + nconf.get('database:database'), {
 	user: nconf.get('database:user'),
 	pass: nconf.get('database:password')
@@ -71,7 +71,7 @@ let sessionHandler = session({
 	saveUninitialized: false
 });
 
-app.use((req, res, next) => sessionHandler(req, res, next));
+app.use(sessionHandler);
 app.use(compression());
 
 if (nconf.get('deploy:travis-token') !== null) {
@@ -94,17 +94,17 @@ app.use(require('./routes/users'));
 app.use(require('./routes/spreadsheet'));
 app.use(require('./content'));
 
-http.listen(nconf.get('port'), () => {
-	console.log('listening on *:' + nconf.get('port'));
-	if (process.send) process.send('online');
-});
-
 app.use((req, res) => {
 	doError(404, req, res);
 });
 app.use((err, req, res) => {
 	console.error(err);
 	doError(500, req, res);
+});
+
+http.listen(nconf.get('port'), () => {
+	console.log('listening on *:' + nconf.get('port'));
+	if (process.send) process.send('online');
 });
 if (process.platform === "win32") {
 	let rl = require("readline").createInterface({

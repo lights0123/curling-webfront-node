@@ -6,41 +6,43 @@
 	<!--<link rel='stylesheet' type='text/css' href='/css/main.css'/>-->
 	<script src="/main.bundle.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	{{#if serviceWorker}}<script>
-		if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.register('/sw.js', {scope: '/'}).then(function (reg) {
-				// registration worked
-				//console.log('Registration succeeded. Scope is ' + reg.scope);
-			}).catch(function (error) {
-				// registration failed
-				//console.log('Registration failed with ' + error);
-			});
-		}
-	</script>{{/if}}
+	{{#if serviceWorker}}
+		<script>
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('/sw.js', {scope: '/'}).then(function (reg) {
+					// registration worked
+					//console.log('Registration succeeded. Scope is ' + reg.scope);
+				}).catch(function (error) {
+					// registration failed
+					//console.log('Registration failed with ' + error);
+				});
+			}
+		</script>{{/if}}
 	<!--[if lt IE 9]>
 	<META http-equiv="refresh" content="0;URL=unsupported">
 	<![endif]-->
 </head>
 <body>
-<div id="container">
-	<nav>
-		<ul>
-			{{#each menu}}
-				<li{{#if this.[1]}} class="{{concat this.[1] conj=" "}}"{{/if}}><a
-						href="{{@key}}"><span>{{this.[0]}}</span></a></li>
-			{{/each}}
-		</ul>
-	</nav>
-	<div id="content">
-		{{#if content}}
-			{{{content}}}
-		{{/if}}
+<nav class="ui secondary pointing stackable menu">
+	{{#each leftMenu}}
+		<a class="item {{concat this.class conj=" "}}" href="{{@key}}">{{this.name}}</a>
+	{{/each}}
+	<div class="right menu">
+		{{#each rightMenu}}
+			<a class="item {{concat this.class conj=" "}}" href="{{@key}}">{{this.name}}</a>
+		{{/each}}
 	</div>
-	<footer>
-		<p>Copyright © {{#if originalYear}}{{originalYear}}{{else}}2015{{/if}}{{#if showSecondYear}}-{{year}}{{/if}} Ben Schattinger. Some rights reserved by the <a
-				href="/license">license</a>.</p>
-		<p><a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a></p>
-	</footer>
+</nav>
+<div class="ui main text container segment raised">
+	{{#if content}}
+		{{{content}}}
+	{{/if}}
 </div>
+<footer class="ui inverted vertical footer segment center aligned">
+	<p>Copyright © {{#if originalYear}}{{originalYear}}{{else}}2015{{/if}}{{#if showSecondYear}}
+		-{{year}}{{/if}} Ben Schattinger. Some rights reserved by the <a
+			href="/license">license</a>.</p>
+	<p><a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a></p>
+</footer>
 </body>
 </html>
