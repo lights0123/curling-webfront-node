@@ -81,7 +81,7 @@
 							}
 						}
 						$("#signup_form").parent().prepend('<div class="notice errorbox"><p></p></div>');
-						$("#signup_form").parent().find("div.notice.errorbox p").text(miscError);
+						$(`#signup_form`).parent().find("div.notice.errorbox p").text(miscError);
 					}
 				});
 			}

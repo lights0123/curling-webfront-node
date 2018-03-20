@@ -7,56 +7,13 @@ import {join} from 'path';
 
 const config = [
 	{
-		target: 'node',
-		devtool: 'eval-source-map',
-		externals: [nodeExternals()],
-		entry: {
-			main: './index.js',
-		},
-		output: {
-			path: __dirname,
-			filename: '[name].bundle.js',
-			libraryTarget: 'commonjs2'
-		},
-		module: {
-			rules: [{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				use: {
-					loader: 'babel-loader',
-					options: {
-						presets: [
-							['env', {
-								'targets': {
-									'node': 'current'
-								}, modules: false
-							}]
-						]
-					}
-				}
-			}]
-		},
-		plugins: [
-			new HardSourceWebpackPlugin({
-				// Either an absolute path or relative to webpack's options.context.
-				cacheDirectory: join(__dirname, 'node_modules/.cache/hard-source-node/[confighash]'),
-				// Either false, a string, an object, or a project hashing function.
-				environmentHash: {
-					root: process.cwd(),
-					directories: [],
-					files: ['yarn.lock'],
-				},
-			})
-		]
-	},
-	{
 		entry: {
 			main: './web/standardPage.js'
 		},
 		devtool: 'source-map',
 		output: {
 			filename: '[name].bundle.js',
-			path: __dirname + '/dist'
+			path: __dirname + '/dist_web'
 		},
 		module: {
 			rules: [
