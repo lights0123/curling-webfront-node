@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{#if title}}CSC Curling | {{title}}{{else}}CSC Curling{{/if}}</title>
+	<meta name="viewport" content="width=device-width">
+	<link rel='stylesheet' type='text/css' href='/css/main.css'/>
+	<script src="/main.bundle.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	{{#if serviceWorker}}
+		<script>
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('/sw.js', {scope: '/'}).then(function (reg) {
+					// registration worked
+					//console.log('Registration succeeded. Scope is ' + reg.scope);
+				}).catch(function (error) {
+					// registration failed
+					//console.log('Registration failed with ' + error);
+				});
+			}
+		</script>{{/if}}
+	<!--[if lt IE 9]>
+	<META http-equiv="refresh" content="0;URL=unsupported">
+	<![endif]-->
+</head>
+<body>
+<nav class="ui secondary pointing stackable menu">
+	{{#each leftMenu}}
+		<a class="item {{concat this.class conj=" "}}" href="{{@key}}">{{this.name}}</a>
+	{{/each}}
+	<div class="right menu">
+		{{#each rightMenu}}
+			<a class="item {{concat this.class conj=" "}}" href="{{@key}}">{{this.name}}</a>
+		{{/each}}
+	</div>
+</nav>
+<div class="ui main text container segment raised">
+	{{{body}}}
+</div>
+<footer class="ui inverted vertical footer segment center aligned">
+	<p>Copyright © {{#if originalYear}}{{originalYear}}{{else}}2015{{/if}}{{#if showSecondYear}}
+		-{{year}}{{/if}} Ben Schattinger. Some rights reserved by the <a
+			href="/license">license</a>.</p>
+	<p><a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a></p>
+</footer>
+</body>
+</html>

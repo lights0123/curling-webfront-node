@@ -1,0 +1,24 @@
+@import '../../node_modules/semantic-ui-css/semantic.min.css';
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url(https://fonts.gstatic.com/s/oxygenmono/v4/BzV4DVOwAgGelLT9EC5xyo4P5ICox8Kq3LLUNMylGO4.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'PT Sans Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('PT Sans Regular'), url('../fonts/PT_Sans-Web-Regular.woff') format('woff');
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.ui.main {
+  flex: 1;
+}
