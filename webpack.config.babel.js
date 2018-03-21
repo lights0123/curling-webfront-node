@@ -76,7 +76,7 @@ const config = [
 			// this handles the bundled .css output file
 			new MiniCssExtractPlugin({
 				filename: 'css/[name].css',
-				path: __dirname + '/dist/css'
+				path: __dirname + '/dist-web/css'
 			}),
 			/*new HardSourceWebpackPlugin({
 				// Either an absolute path or relative to webpack's options.context.
