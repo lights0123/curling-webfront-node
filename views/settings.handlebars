@@ -3,7 +3,7 @@
 	<ul>
 		{{#each panels}}
 			<li{{#if this.selected}} id="selected"{{/if}}>
-				<a href="/settings?panel={{{encodeURIComponent this.name}}}" class="autoexempt">
+				<a href="/settings?panel={{{encodeURIComponent this.name}}}">
 					<div></div>
 					<span>{{this.name}}</span>
 				</a>
@@ -14,7 +14,7 @@
 {{#each panels}}
 	<div{{#if this.selected}} id="selected-content"{{/if}} data-com-curlcsc-settingpanel-id="{{this.name}}">
 		<div>
-			{{{this.content}}}
+			{{> (lookup . 'this.content') }}
 		</div>
 	</div>
 {{/each}}

@@ -26,9 +26,11 @@
 		"babel-core": "^6.26.0",
 		"babel-loader": "^7.1.4",
 		"babel-preset-env": "^1.6.1",
+		"babel-preset-stage-2": "^6.24.1",
 		"babel-register": "^6.26.0",
 		"chai": "^3.5.0",
 		"clean-webpack-plugin": "^0.1.19",
+		"concurrently": "^3.5.1",
 		"css-loader": "^0.28.11",
 		"file-loader": "^1.1.11",
 		"hard-source-webpack-plugin": "^0.6.4",
@@ -45,8 +47,8 @@
 		"webpack-node-externals": "^1.6.0"
 	},
 	"scripts": {
-		"build": "webpack",
-		"start": "node main.bundle.js",
+		"build": "concurrently \"webpack -d\" \"babel lib -d dist --source-maps inline\"",
+		"start": "node dist/index.js",
 		"test": "mocha --recursive test"
 	}
 }

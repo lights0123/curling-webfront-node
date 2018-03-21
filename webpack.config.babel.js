@@ -1,9 +1,8 @@
-import nodeExternals from 'webpack-node-externals';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
-import CleanWebpackPlugin from 'clean-webpack-plugin';
-import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
-import {join} from 'path';
+//import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
+//import CleanWebpackPlugin from 'clean-webpack-plugin';
+//import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
+//import {join} from 'path';
 
 const config = [
 	{
@@ -13,7 +12,7 @@ const config = [
 		devtool: 'source-map',
 		output: {
 			filename: '[name].bundle.js',
-			path: __dirname + '/dist_web'
+			path: __dirname + '/dist-web'
 		},
 		module: {
 			rules: [
@@ -22,19 +21,19 @@ const config = [
 					// this handles .scss translation
 					use: [
 						{loader: 'style-loader'},
-						//MiniCssExtractPlugin.loader,
+						MiniCssExtractPlugin.loader,
 						{
 							loader: 'css-loader',
 							options: {
 								sourceMap: true,
-								//minimize: true
+								minimize: true
 							}
 						},
 						{
 							loader: 'sass-loader',
 							options: {
 								sourceMap: true,
-								//minimize: true
+								minimize: true
 							}
 						}
 					]
@@ -79,7 +78,7 @@ const config = [
 				filename: 'css/[name].css',
 				path: __dirname + '/dist/css'
 			}),
-			new HardSourceWebpackPlugin({
+			/*new HardSourceWebpackPlugin({
 				// Either an absolute path or relative to webpack's options.context.
 				cacheDirectory: join(__dirname, 'node_modules/.cache/hard-source-browser/[confighash]'),
 				// Either false, a string, an object, or a project hashing function.
@@ -88,7 +87,7 @@ const config = [
 					directories: [],
 					files: ['yarn.lock'],
 				},
-			})
+			})*/
 		]
 	}
 ];
